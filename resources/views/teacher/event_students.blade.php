@@ -71,7 +71,9 @@
                     <tr>
                         <th scope="col">Student ID</th>
                         <th scope="col">Name </th>
-                        <th scope="col"></th>
+                        @can('remove-student-from-feedback-event')
+                            <th scope="col"></th>
+                        @endcan
                     </tr>
                 </thead>
                 <tbody>
@@ -79,15 +81,17 @@
                         <tr>
                             <td>{{ $student->student_id }}</td>
                             <td>{{ $student->name }}</td>
-                            <td>
-                                <form method="POST"
-                                    action="{{ route('assessment_events.assessment_event_students.destroy', ['assessment_event' => $student->event_id, 'assessment_event_student' => $student->id]) }}"
-                                    onsubmit="return confirm('Are you sure you want to remove the item?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger btn-sm">DELETE</button>
-                                </form>
-                            </td>
+                            @can('remove-student-from-feedback-event')
+                                <td>
+                                    <form method="POST"
+                                        action="{{ route('assessment_events.assessment_event_students.destroy', ['assessment_event' => $student->event_id, 'assessment_event_student' => $student->id]) }}"
+                                        onsubmit="return confirm('Are you sure you want to remove the item?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">DELETE</button>
+                                    </form>
+                                </td>
+                            @endcan
                         </tr>
                     @endforeach
                 </tbody>

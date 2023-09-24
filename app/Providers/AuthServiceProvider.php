@@ -2,13 +2,14 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
-
+use App\Http\Controllers\Enum\UserRoles;
 use App\Models\assessment_event;
 use App\Models\student_group_member;
+use App\Models\User;
 use App\Policies\AssessmentEventPolicy;
 use App\Policies\StudentGroupMemberPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -30,6 +31,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Gate::define('remove-student-from-feedback-event', function (User $user) {
+            return $user->role == UserRoles::department_admin->name;
+        });
     }
 }
