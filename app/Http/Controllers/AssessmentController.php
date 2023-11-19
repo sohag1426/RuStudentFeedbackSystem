@@ -48,7 +48,7 @@ class AssessmentController extends Controller
         }
 
         if (assessment_status::where('event_id', $assessment_event->id)->where('student_id', $assessment_event_student->student_id)->count() != 0) {
-            return redirect()->route('assessment_event_students.assessment_events.index', ['assessment_event_student' => $assessment_event_student])->with('info', 'assessment was completed!');
+            return redirect()->route('assessment_event_students.assessment_events.index', ['assessment_event_student' => $assessment_event_student])->with('info', 'feedback was completed!');
         }
 
         if (Carbon::now()->lessThan(Carbon::createFromFormat(config('datetimeformat.date_time_format'), $assessment_event->start_time))) {
@@ -118,6 +118,6 @@ class AssessmentController extends Controller
         $assessment_status->status = 1;
         $assessment_status->save();
 
-        return redirect()->route('assessment_event_students.assessment_events.index', ['assessment_event_student' => $assessment_event_student])->with('info', 'assessment done successfully!');
+        return redirect()->route('assessment_event_students.assessment_events.index', ['assessment_event_student' => $assessment_event_student])->with('info', 'feedback done successfully!');
     }
 }

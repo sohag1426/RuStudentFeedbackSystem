@@ -29,7 +29,7 @@ class AssessmentEventPolicy
             return false;
         }
 
-        if (assessment::where('event_id', $assessmentEvent->id)->count()) {
+        if (assessment::where('event_id', $assessmentEvent->id)->count() > 1) {
             return true;
         }
 
