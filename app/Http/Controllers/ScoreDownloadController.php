@@ -49,11 +49,11 @@ class ScoreDownloadController extends Controller
                 $assessment_event->score,
             ])
             ->addRow([
-                'group_average',
+                'group_average (The average feedback score for the same student group across all courses)',
                 $assessment_event->group_average,
             ])
             ->addRow([
-                'group_highest',
+                'group_highest (The highest feedback score for the same student group across all courses)',
                 $assessment_event->group_highest,
             ])
             ->addRow([
