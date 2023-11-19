@@ -1,7 +1,7 @@
 @extends ('laraview.layouts.sideNavLayout')
 
 @section('title')
-    New Assessment Event
+    New Feedback Event
 @endsection
 
 @section('pageCss')
@@ -19,7 +19,7 @@
 @endsection
 
 @section('contentTitle')
-    <h3>New Assessment Event</h3>
+    <h3>New Feedback Event</h3>
 @endsection
 
 @section('content')
@@ -47,10 +47,8 @@
                         <div class="form-group">
                             <label for="teacher_id">Teacher</label>
                             <select class="form-control" id="teacher_id" name="teacher_id" required>
-                                <option value="">Please select...</option>
-                                @foreach ($teachers as $teacher)
-                                    <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
-                                @endforeach
+                                <option value="{{ auth('web')->user()->id }}" selected>{{ auth('web')->user()->name }}
+                                </option>
                             </select>
                         </div>
                         <!--/teacher_id-->
