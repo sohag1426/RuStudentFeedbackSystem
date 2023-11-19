@@ -55,6 +55,7 @@
                     <tr>
                         <th scope="col">Name</th>
                         <th scope="col">Email</th>
+                        <th scope="col">Mobile</th>
                     </tr>
                 </thead>
 
@@ -63,6 +64,7 @@
                         <tr>
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
+                            <td>{{ $user->mobile }}</td>
                         </tr>
                     @endforeach
                 </tbody>
