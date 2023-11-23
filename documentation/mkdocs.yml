@@ -1,0 +1,7 @@
+site_name: Studen Feeback System
+site_url: https://sfs.ru.ac.bd/docs
+docs_dir: docs
+site_dir: ../public/docs
+nav:
+  - 'Guide For Student': 'index.md'
+  - 'Guide For Teacher': 'teacher.md'
