@@ -118,6 +118,6 @@ class AssessmentController extends Controller
         $assessment_status->status = 1;
         $assessment_status->save();
 
-        return redirect()->route('assessment_event_students.assessment_events.index', ['assessment_event_student' => $assessment_event_student])->with('info', 'feedback done successfully!');
+        return redirect()->route('assessment_event_students.assessment_events.index', ['assessment_event_student' => $assessment_event_student])->with('info', 'feedback submitted successfully!');
     }
 }
