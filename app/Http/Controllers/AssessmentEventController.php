@@ -72,14 +72,22 @@ class AssessmentEventController extends Controller
             'stop_minute' => ['required', 'numeric'],
         ]);
 
+        $now = Carbon::now('Asia/Dhaka')->setHour(0)->setMinute(0);
+
         $start_date = date_format(date_create($request->start_date), config('datetimeformat.date_format'));
         $stop_date = date_format(date_create($request->stop_date), config('datetimeformat.date_format'));
 
         $start_time = Carbon::createFromFormat(config('datetimeformat.date_format'), $start_date);
         $start_time->setHour($request->start_hour)->setMinute($request->start_minute);
+        if ($start_time->lessThan($now)) {
+            return redirect()->route('assessment_events.create')->with('info', 'Backdated events are not possible to create.');
+        }
 
         $stop_time = Carbon::createFromFormat(config('datetimeformat.date_format'), $stop_date);
         $stop_time->setHour($request->stop_hour)->setMinute($request->stop_minute);
+        if ($stop_time->lessThan($start_time)) {
+            return redirect()->route('assessment_events.create')->with('info', 'It is not possible to stop before the start time.');
+        }
 
         $assessment_event = new assessment_event();
         $assessment_event->user_id = $request->user()->id;
@@ -152,14 +160,22 @@ class AssessmentEventController extends Controller
             'stop_minute' => ['required', 'numeric'],
         ]);
 
+        $now = Carbon::now('Asia/Dhaka')->setHour(0)->setMinute(0);
+
         $start_date = date_format(date_create($request->start_date), config('datetimeformat.date_format'));
         $stop_date = date_format(date_create($request->stop_date), config('datetimeformat.date_format'));
 
         $start_time = Carbon::createFromFormat(config('datetimeformat.date_format'), $start_date);
         $start_time->setHour($request->start_hour)->setMinute($request->start_minute);
+        if ($start_time->lessThan($now)) {
+            return redirect()->route('assessment_events.edit', ['assessment_event' => $assessment_event])->with('info', 'Backdated events are not possible to create.');
+        }
 
         $stop_time = Carbon::createFromFormat(config('datetimeformat.date_format'), $stop_date);
         $stop_time->setHour($request->stop_hour)->setMinute($request->stop_minute);
+        if ($stop_time->lessThan($start_time)) {
+            return redirect()->route('assessment_events.edit', ['assessment_event' => $assessment_event])->with('info', 'It is not possible to stop before the start time.');
+        }
 
         $assessment_event->teacher_id = $request->teacher_id;
         $assessment_event->course_id = $request->course_id;
