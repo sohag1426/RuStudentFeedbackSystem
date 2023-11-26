@@ -41,12 +41,7 @@ class StudentLoginController extends Controller
             return redirect()->route('student-login-form')->with('info', 'There is no course available for you to provide feedback');
         }
 
-        // No event for assessment/feedback
         $assessment_event_student = assessment_event_student::where('student_id', $request->student_id)->first();
-        $assessable_events = AssessmentEventController::getAssessableEvents($assessment_event_student);
-        if ($assessable_events->count() == 0) {
-            return redirect()->route('student-login-form')->with('info', 'There is no course available for you to provide feedback');
-        }
 
         // check password
         $verify = $this->verify($request->student_id, $request->password);

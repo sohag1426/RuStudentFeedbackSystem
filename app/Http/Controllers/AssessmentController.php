@@ -28,7 +28,7 @@ class AssessmentController extends Controller
             return redirect()->route('student-login-form')->with('info', 'Invalid Token');
         }
 
-        $assessable_events = AssessmentEventController::getAssessableEvents($assessment_event_student);
+        $assessable_events = AssessmentEventController::getFeedbackEvents($assessment_event_student);
 
         return view('student.events', ['assessable_events' => $assessable_events, 'assessment_event_student' => $assessment_event_student]);
     }

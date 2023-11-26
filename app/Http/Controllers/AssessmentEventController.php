@@ -12,6 +12,7 @@ use App\Models\student_group_member;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class AssessmentEventController extends Controller
 {
@@ -245,21 +246,23 @@ class AssessmentEventController extends Controller
      * @param  \App\Models\assessment_event_student  $assessment_event_student
      * @return \Illuminate\Http\Response
      */
-    public static function getAssessableEvents(assessment_event_student $assessment_event_student)
+    public static function getFeedbackEvents(assessment_event_student $assessment_event_student): Collection
     {
-
         $event_ids = assessment_event_student::where('student_id', $assessment_event_student->student_id)->get()
             ->pluck('event_id')
             ->unique();
 
         $assessment_events = assessment_event::whereIn('id', $event_ids)
-            ->where('stop_time', '>=', Carbon::now()->format(config('datetimeformat.date_time_format')))
             ->get();
 
-        $assessment_events =  $assessment_events->filter(function (assessment_event $value, int $key) use ($assessment_event_student) {
-            return assessment_status::where('event_id', $value->id)->where('student_id', $assessment_event_student->student_id)->count() == 0;
+        $notYetSubmittedEvents =  $assessment_events->filter(function (assessment_event $value, int $key) use ($assessment_event_student) {
+            return ($value->stop_time >=  Carbon::now()->format(config('datetimeformat.date_time_format'))) && (assessment_status::where('event_id', $value->id)->where('student_id', $assessment_event_student->student_id)->count() == 0);
         });
 
-        return $assessment_events;
+        $submittedEvents =  $assessment_events->filter(function (assessment_event $value, int $key) use ($assessment_event_student) {
+            return assessment_status::where('event_id', $value->id)->where('student_id', $assessment_event_student->student_id)->count();
+        });
+
+        return collect(['submitted' => $submittedEvents, 'notYetSubmitted' => $notYetSubmittedEvents]);
     }
 }
