@@ -1,4 +1,4 @@
-@extends ('laraview.layouts.sideNavLayout')
+@extends('laraview.layouts.sideNavLayout')
 
 @section('title')
     courses
@@ -53,11 +53,13 @@
                             <td>{{ $course->name }}</td>
                             <td>
                                 {{-- Edit --}}
-                                <a class="btn btn-outline-info btn-sm mb-2"
-                                    href="{{ route('courses.edit', ['course' => $course]) }}">
-                                    <i class="fas fa-edit"></i>
-                                    Edit
-                                </a>
+                                @can('update', $course)
+                                    <a class="btn btn-outline-info btn-sm mb-2"
+                                        href="{{ route('courses.edit', ['course' => $course]) }}">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                    </a>
+                                @endcan
                                 {{-- Edit --}}
                             </td>
                         </tr>

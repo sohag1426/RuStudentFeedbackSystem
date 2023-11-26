@@ -4,9 +4,11 @@ namespace App\Providers;
 
 use App\Http\Controllers\Enum\UserRoles;
 use App\Models\assessment_event;
+use App\Models\course;
 use App\Models\student_group_member;
 use App\Models\User;
 use App\Policies\AssessmentEventPolicy;
+use App\Policies\CoursePolicy;
 use App\Policies\StudentGroupMemberPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -22,6 +24,7 @@ class AuthServiceProvider extends ServiceProvider
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
         assessment_event::class => AssessmentEventPolicy::class,
         student_group_member::class => StudentGroupMemberPolicy::class,
+        course::class => CoursePolicy::class,
     ];
 
     /**

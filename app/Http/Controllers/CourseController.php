@@ -46,6 +46,14 @@ class CourseController extends Controller
             'name' => 'required|string',
         ]);
 
+        if (course::where('department_id', $request->user()->department_id)->where('code', $request->code)->count()) {
+            return redirect()->route('courses.index')->with('info', 'Duplicate Course Code');
+        }
+
+        if (course::where('department_id', $request->user()->department_id)->where('name', $request->name)->count()) {
+            return redirect()->route('courses.index')->with('info', 'Duplicate Course Name');
+        }
+
         $course = new course();
         $course->user_id = $request->user()->id;
         $course->department_id = $request->user()->department_id;
@@ -82,6 +90,18 @@ class CourseController extends Controller
             'code' => 'required|string',
             'name' => 'required|string',
         ]);
+
+        if ($request->code != $course->code) {
+            if (course::where('department_id', $request->user()->department_id)->where('code', $request->code)->count()) {
+                return redirect()->route('courses.index')->with('info', 'Duplicate Course Code');
+            }
+        }
+
+        if ($request->name != $course->name) {
+            if (course::where('department_id', $request->user()->department_id)->where('name', $request->name)->count()) {
+                return redirect()->route('courses.index')->with('info', 'Duplicate Course Name');
+            }
+        }
 
         $course->code = $request->code;
         $course->name = $request->name;
