@@ -71,9 +71,7 @@
                     <tr>
                         <th scope="col">Student ID</th>
                         <th scope="col">Name </th>
-                        @can('remove-student-from-feedback-event')
-                            <th scope="col"></th>
-                        @endcan
+                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -81,16 +79,18 @@
                         <tr>
                             <td>{{ $student->student_id }}</td>
                             <td>{{ $student->name }}</td>
-                            @can('remove-student-from-feedback-event')
+                            @can('remove-student-from-feedback-event', [$assessment_event, $student])
                                 <td>
                                     <form method="POST"
-                                        action="{{ route('assessment_events.assessment_event_students.destroy', ['assessment_event' => $student->event_id, 'assessment_event_student' => $student->id]) }}"
+                                        action="{{ route('assessment_events.assessment_event_students.destroy', ['assessment_event' => $assessment_event, 'assessment_event_student' => $student->id]) }}"
                                         onsubmit="return confirm('Are you sure you want to remove the item?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-outline-danger btn-sm">DELETE</button>
                                     </form>
                                 </td>
+                            @else
+                                <td></td>
                             @endcan
                         </tr>
                     @endforeach

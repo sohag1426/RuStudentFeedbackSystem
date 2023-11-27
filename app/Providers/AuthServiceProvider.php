@@ -3,7 +3,10 @@
 namespace App\Providers;
 
 use App\Http\Controllers\Enum\UserRoles;
+use App\Models\assessment;
 use App\Models\assessment_event;
+use App\Models\assessment_event_student;
+use App\Models\assessment_status;
 use App\Models\course;
 use App\Models\student_group_member;
 use App\Models\User;
@@ -34,8 +37,11 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Gate::define('remove-student-from-feedback-event', function (User $user) {
-            return $user->role == UserRoles::department_admin->name;
+        Gate::define('remove-student-from-feedback-event', function (User $user, assessment_event $assessment_event, assessment_event_student $assessment_event_student) {
+            if (assessment_status::where('event_id', $assessment_event->id)->where('student_id', $assessment_event_student->student_id)->count()) {
+                return false;
+            }
+            return true;
         });
     }
 }
