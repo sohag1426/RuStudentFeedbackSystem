@@ -6,9 +6,12 @@ use App\Models\assessment_event;
 use App\Models\comment;
 use App\Models\detailed_score;
 use Illuminate\Http\Request;
-use OpenSpout\Common\Entity\Style\Color;
-use OpenSpout\Writer\Common\Creator\Style\StyleBuilder;
 use Spatie\SimpleExcel\SimpleExcelWriter;
+use OpenSpout\Common\Entity\Style\Color;
+use OpenSpout\Common\Entity\Style\CellAlignment;
+use OpenSpout\Common\Entity\Style\Style;
+use OpenSpout\Common\Entity\Style\Border;
+use OpenSpout\Common\Entity\Style\BorderPart;
 
 class ScoreDownloadController extends Controller
 {
@@ -22,16 +25,14 @@ class ScoreDownloadController extends Controller
     {
         $this->authorize('downloadReport', [$assessment_event]);
 
-        // $style = (new StyleBuilder())
-        //     ->setFontBold()
-        //     ->setFontSize(15)
-        //     ->setFontColor(Color::BLACK)
-        //     ->setShouldWrapText()
-        //     ->setBackgroundColor(Color::WHITE)
-        //     ->build();
+        $style = (new Style())
+            ->setFontBold()
+            ->setFontSize(15)
+            ->setShouldWrapText();
 
         $writer = SimpleExcelWriter::streamDownload('score.xlsx')
             ->noHeaderRow()
+            ->addRow(['Course Information: '], $style)
             ->addRow([
                 'department',
                 $assessment_event->department->en_name,
@@ -63,7 +64,7 @@ class ScoreDownloadController extends Controller
             ->addRow([
                 "question",
                 "score",
-            ]);
+            ], $style);
 
         $detailed_scores = detailed_score::with('question')->where('event_id', $assessment_event->id)->get();
 
@@ -82,7 +83,7 @@ class ScoreDownloadController extends Controller
 
         $writer->addRow([
             "comments",
-        ]);
+        ], $style);
 
         foreach ($comments as $comment) {
             $writer->addRow([
