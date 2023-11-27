@@ -46,7 +46,7 @@ class CoursePolicy
             return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -58,7 +58,7 @@ class CoursePolicy
             return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
