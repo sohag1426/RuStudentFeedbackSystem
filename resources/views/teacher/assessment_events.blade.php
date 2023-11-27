@@ -100,7 +100,7 @@
                                 <a class="btn btn-outline-info btn-sm mb-2"
                                     href="{{ route('assessment_events.status.index', ['assessment_event' => $assessment_event]) }}">
                                     <i class="fas fa-info-circle"></i>
-                                    Assessment Status
+                                    Feedback Status
                                 </a>
 
                                 {{-- Generate Report --}}
