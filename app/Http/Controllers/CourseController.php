@@ -92,13 +92,13 @@ class CourseController extends Controller
         ]);
 
         if ($request->code != $course->code) {
-            if (course::where('department_id', $request->user()->department_id)->where('code', $request->code)->count()) {
+            if (course::where('department_id', $request->user()->department_id)->where('code', '==', $request->code)->count()) {
                 return redirect()->route('courses.index')->with('info', 'Duplicate Course Code');
             }
         }
 
         if ($request->name != $course->name) {
-            if (course::where('department_id', $request->user()->department_id)->where('name', $request->name)->count()) {
+            if (course::where('department_id', $request->user()->department_id)->where('name', '==', $request->name)->count()) {
                 return redirect()->route('courses.index')->with('info', 'Duplicate Course Name');
             }
         }
