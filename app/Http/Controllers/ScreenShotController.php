@@ -27,7 +27,7 @@ class ScreenShotController extends Controller
 
         // starts headless chrome
         $browser = $browserFactory->createBrowser([
-            'headers'   => ['cookie' => $request->headers->get('cookie'), 'Content-Type' => 'text/html; charset=utf-8'],
+            'headers'   => ['cookie' => $request->headers->get('cookie')],
             'enableImages' => true,
             'windowSize' => [1280, 1024],
         ]);
