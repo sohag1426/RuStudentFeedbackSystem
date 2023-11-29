@@ -29,11 +29,13 @@ class ExcelToUsersCommand extends Command
      */
     public function handle()
     {
+        // NETWORK ENGINEER added as a Tester of the application
         $designationsKeyWords = [
             'LECTURER',
             'PROFESSOR',
             'CHANCELLOR',
             'TREASURER',
+            'NETWORK ENGINEER'
         ];
 
         $pathToFile = $this->ask('Excel File Location ?');
@@ -48,7 +50,7 @@ class ExcelToUsersCommand extends Command
                 }
 
                 // Filter Teacher | Only Teacher
-                $contains = Str::contains($rowProperties['emp_degn'], $designationsKeyWords);
+                $contains = Str::contains(strtoupper($rowProperties['emp_degn']), $designationsKeyWords);
                 if ($contains == false) {
                     return;
                 }
