@@ -11,6 +11,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\SampleExcel;
 use App\Http\Controllers\ScoreDownloadController;
 use App\Http\Controllers\ScoreGenerateController;
+use App\Http\Controllers\ScreenShotController;
 use App\Http\Controllers\StudenLogoutController;
 use App\Http\Controllers\StudentGroupController;
 use App\Http\Controllers\StudentGroupMemberController;
@@ -57,10 +58,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('download-score/{assessment_event}', ScoreDownloadController::class)->name('download-score');
     Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
     Route::get('change-logs', [LogController::class, 'index'])->name('change-logs');
-    Route::get('/mailable', function () {
-        $user = App\Models\User::find(1);
-        return new App\Mail\AccountCreatedOnTeacherAssessmentSystem($user, 'abds23421kla33');
-    });
+    Route::get('screenshot', ScreenShotController::class);
 });
 
 require __DIR__ . '/auth.php';

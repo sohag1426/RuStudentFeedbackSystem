@@ -36,7 +36,7 @@ class AccountCreatedOnTeacherAssessmentSystem extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Account Created On Teacher Assessment System',
+            subject: 'Account Created On Studen Feedback System',
         );
     }
 

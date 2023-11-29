@@ -1,7 +1,7 @@
 <x-mail::message>
 # Dear Sir
 
-An account for you has been created successfully in the Teacher Assessment System.
+An account for you has been created successfully in the Student Feedback System.
 
 The account access information is as follows:
 
