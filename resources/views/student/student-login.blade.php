@@ -42,17 +42,34 @@
                 <div class="collapse navbar-collapse order-3" id="navbarCollapse">
 
                     <ul class="navbar-nav">
-                        <li class="nav-item">
+
+                        <li class="nav-item ml-2">
                             <a class="btn btn-outline-info" href="{{ route('login') }}" role="button">
                                 <i class="fas fa-user-cog"></i>Teacher Login
                             </a>
                         </li>
-                        <li class="nav-item ml-lg-2">
+
+                        <li class="nav-item ml-2">
                             <a class="btn btn-outline-info" href="https://github.com/sohag1426/RuStudentFeedbackSystem"
                                 role="button">
                                 <i class="fab fa-github"></i> Source Code
                             </a>
                         </li>
+
+                        <li class="nav-item ml-2">
+                            <a class="btn btn-outline-info" href="https://youtu.be/e8idHHhUOFE?si=tcK6xD6slmEVuMZS"
+                                role="button">
+                                <i class="fas fa-user-cog"></i> <i class="fas fa-play-circle"></i> Tutorial for Teacher
+                            </a>
+                        </li>
+
+                        <li class="nav-item ml-2">
+                            <a class="btn btn-outline-info" href="https://youtu.be/Cqv_gZrCzcs?si=RnAAm1sP8H0th5IH"
+                                role="button">
+                                <i class="fas fa-play-circle"></i> Tutorial for Student
+                            </a>
+                        </li>
+
                     </ul>
 
                 </div>
