@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\course;
-use App\Models\log;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
@@ -107,25 +106,6 @@ class CourseController extends Controller
         $course->name = $request->name;
         $course->save();
 
-        // log
-        if ($course->wasChanged('code') || $course->wasChanged('name')) {
-            $log_message = '';
-            if ($course->wasChanged('code')) {
-                $log_message .= 'course code was changed from ' . $course->getOriginal('code') . ' to ' . $course->code;
-            }
-            if ($course->wasChanged('name')) {
-                $log_message .= ' course name was changed from ' . $course->getOriginal('name') . ' to ' . $course->name;
-            }
-
-            $log = new log();
-            $log->user_id = $request->user()->id;
-            $log->department_id = $request->user()->department_id;
-            $log->topic = 'course updated';
-            $log->log = $log_message;
-            $log->model_type = 'App\Models\course';
-            $log->model_id = $course->id;
-            $log->save();
-        }
         return redirect()->route('courses.index');
     }
 }
