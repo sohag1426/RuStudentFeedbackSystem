@@ -52,9 +52,6 @@
                             <select class="form-control" id="teacher_id" name="teacher_id" required>
                                 <option value="{{ $assessment_event->teacher_id }}">{{ $assessment_event->teacher->name }}
                                 </option>
-                                @foreach ($teachers as $teacher)
-                                    <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
-                                @endforeach
                             </select>
                         </div>
                         <!--/teacher_id-->
