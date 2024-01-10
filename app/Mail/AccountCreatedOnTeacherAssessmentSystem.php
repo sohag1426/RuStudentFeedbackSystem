@@ -2,9 +2,8 @@
 
 namespace App\Mail;
 
-use App\Models\User;
+use App\Models\Admin;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -23,11 +22,11 @@ class AccountCreatedOnTeacherAssessmentSystem extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(User $user, string $password)
+    public function __construct(Admin $user, string $password)
     {
         $this->user = $user;
         $this->password = $password;
-        $this->login_url = route('login');
+        $this->login_url = route('admin-login');
     }
 
     /**

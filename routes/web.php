@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AssessmentEventController;
 use App\Http\Controllers\AssessmentEventStudentController;
@@ -59,6 +61,18 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
     Route::get('change-logs', [LogController::class, 'index'])->name('change-logs');
     Route::get('screenshot', ScreenShotController::class);
+});
+
+Route::middleware('guest.admin:admin')->group(function () {
+    Route::get('admin-login', [AdminLoginController::class, 'create'])
+        ->name('admin-login');
+    Route::post('admin-login', [AdminLoginController::class, 'store']);
+});
+
+Route::middleware('auth.admin:admin')->group(function () {
+    Route::get('/admin-dashboard', [AdminDashboardController::class, 'index'])->name('admin-dashboard');
+    Route::post('admin-logout', [AdminLoginController::class, 'destroy'])
+        ->name('admin-logout');
 });
 
 require __DIR__ . '/auth.php';
