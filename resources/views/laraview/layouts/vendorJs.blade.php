@@ -1,5 +1,3 @@
-{{-- pace --}}
-<script data-pace-options='{ "ajax": false }' src="/jsPlugins/pace-1.2.4/pace.min.js"></script>
 <!-- jQuery -->
 <script src="/themes/adminlte3x/plugins/jquery/jquery.min.js"></script>
 <!--jquery-ui-1.12.1-->

@@ -17,7 +17,5 @@
 <link rel="stylesheet" href="/themes/adminlte3x/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="/themes/adminlte3x/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
 <link rel="stylesheet" href="/themes/adminlte3x/plugins/datatables-searchpanes/css/searchPanes.bootstrap4.min.css" />
-{{-- pace center-simple || loading-bar --}}
-<link rel="stylesheet" href="/jsPlugins/pace-1.2.4/themes/black/pace-theme-loading-bar.css">
 <!-- Theme style -->
 <link rel="stylesheet" href="/themes/adminlte3x/dist/css/adminlte.min.css">

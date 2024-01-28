@@ -31,7 +31,7 @@ class ScoreGenerateController extends Controller
         $total_score = $assessments->sum('score');
         $average_score = $total_score / $assessments_count;
 
-        $assessment_event->score = $average_score;
+        $assessment_event->score = round($average_score, 2);
         $assessment_event->assessment_count = $assessments_count;
         $assessment_event->save();
 
@@ -49,7 +49,7 @@ class ScoreGenerateController extends Controller
             $detailed_score->event_id = $assessment_event->id;
             $detailed_score->question_id = $question_id;
             $detailed_score->assessment_count = $assessments_group_count;
-            $detailed_score->score = $average_score;
+            $detailed_score->score = round($average_score, 2);
             $detailed_score->save();
         }
 
@@ -59,9 +59,9 @@ class ScoreGenerateController extends Controller
             ->get();
         $group_sum = $assessment_events->sum('score');
         $group_average = $group_sum / $assessment_events->count();
-        $assessment_event->group_average = $group_average;
-        $assessment_event->group_highest = $assessment_events->max('score');
-        $assessment_event->group_lowest = $assessment_events->min('score');
+        $assessment_event->group_average =  round($group_average, 2);
+        $assessment_event->group_highest = round($assessment_events->max('score'), 2);
+        $assessment_event->group_lowest = round($assessment_events->min('score'), 2);
         $assessment_event->save();
 
         return redirect()->route('assessment_events.index')->with('info', 'Report Generated Successfully');
