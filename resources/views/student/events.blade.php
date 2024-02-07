@@ -41,7 +41,8 @@
                     <div class="card" style="width: 20rem;">
                         <div class="card-body">
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item"><strong>Course: </strong> {{ $assessment_event->course->name }}
+                                <li class="list-group-item"><strong>Course: </strong>
+                                    {{ $assessment_event->course->name }} ({{ $assessment_event->course->code }})
                                 </li>
                                 <li class="list-group-item"><strong>Teacher: </strong>
                                     {{ $assessment_event->teacher->name }}
@@ -79,7 +80,9 @@
                 <tbody>
                     @foreach ($assessable_events->get('submitted') as $submitted_event)
                         <tr>
-                            <th scope="row">{{ $submitted_event->course->name }}</th>
+                            <th scope="row">
+                                {{ $submitted_event->course->name }} ( {{ $assessment_event->course->code }} )
+                            </th>
                             <td>{{ $submitted_event->teacher->name }}</td>
                             <td>{{ $submitted_event->start_time }}</td>
                             <td>{{ $submitted_event->stop_time }}</td>

@@ -24,7 +24,7 @@
             <div class="callout callout-info">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><span class="font-weight-bold"> Course : </span>
-                        {{ $assessment_event->course->name }}
+                        {{ $assessment_event->course->name }} ({{ $assessment_event->course->code }})
                     </li>
                     <li class="list-group-item"><span class="font-weight-bold"> Teacher : </span>
                         {{ $assessment_event->teacher->name }}</li>

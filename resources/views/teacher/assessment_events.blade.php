@@ -77,7 +77,9 @@
                         <tr>
                             <td scope="row">{{ $assessment_event->id }}</td>
                             <td>{{ $assessment_event->teacher->name }}</td>
-                            <td>{{ $assessment_event->course->name }}</td>
+                            <td>
+                                {{ $assessment_event->course->name }} ({{ $assessment_event->course->code }})
+                            </td>
                             <td>{{ $assessment_event->group->name }}</td>
                             <td>{{ $assessment_event->start_time }}</td>
                             <td>{{ $assessment_event->stop_time }}</td>

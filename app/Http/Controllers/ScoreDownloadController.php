@@ -43,7 +43,7 @@ class ScoreDownloadController extends Controller
             ])
             ->addRow([
                 'course',
-                $assessment_event->course->name,
+                $assessment_event->course->name . "(" . $assessment_event->course->code . ")",
             ])
             ->addRow([
                 'score',
