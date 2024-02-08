@@ -81,7 +81,7 @@
                     @foreach ($assessable_events->get('submitted') as $submitted_event)
                         <tr>
                             <th scope="row">
-                                {{ $submitted_event->course->name }} ( {{ $assessment_event->course->code }} )
+                                {{ $submitted_event->course->name }} ( {{ $submitted_event->course->code }} )
                             </th>
                             <td>{{ $submitted_event->teacher->name }}</td>
                             <td>{{ $submitted_event->start_time }}</td>
