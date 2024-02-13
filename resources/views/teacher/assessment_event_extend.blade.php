@@ -80,11 +80,20 @@
                         </div>
                         <!--/start_time-->
 
+                        <!--stop_time-->
+                        <div class="form-group">
+                            <label for="group_id">Stop Time</label>
+                            <select class="form-control" id="group_id" disabled>
+                                <option>{{ $assessment_event->stop_time }}</option>
+                            </select>
+                        </div>
+                        <!--/stop_time-->
+
                         <div class="form-row">
 
                             <!--stop_date-->
                             <div class='form-group col-md-6'>
-                                <label for='datepicker2'>Stop Date</label>
+                                <label for='datepicker2'>New Stop Date</label>
                                 <input type='text' name='stop_date' id='datepicker2' class='form-control'
                                     value="{{ $assessment_event->stop_date }}" required>
                             </div>
@@ -92,7 +101,7 @@
 
                             {{-- stop_hour --}}
                             <div class="form-group col-md-3">
-                                <label for="stop_hour">Stop Hour</label>
+                                <label for="stop_hour">New Stop Hour</label>
                                 <select name="stop_hour" id="stop_hour" class="form-control" required>
                                     <option selected>{{ $assessment_event->stop_hour }}</option>
                                     @for ($i = 8; $i < 20; $i++)
@@ -104,7 +113,7 @@
 
                             {{-- stop_minute --}}
                             <div class="form-group col-md-3">
-                                <label for="stop_minute">Stop Minute</label>
+                                <label for="stop_minute">New Stop Minute</label>
                                 <select name="stop_minute" id="stop_minute" class="form-control" required>
                                     <option selected>{{ $assessment_event->stop_minute }}</option>
                                     @for ($i = 0; $i < 60; $i = $i + 5)
