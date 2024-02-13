@@ -71,35 +71,14 @@
                         </div>
                         <!--/group_id-->
 
-                        <div class="form-row">
-
-                            <!--start_date-->
-                            <div class='form-group col-md-6'>
-                                <label>Start Date</label>
-                                <input type='text' class='form-control' value="{{ $assessment_event->start_date }}"
-                                    disabled>
-                            </div>
-                            <!--/start_date-->
-
-                            {{-- start_hour --}}
-                            <div class="form-group col-md-3">
-                                <label for="start_hour">Start Hour</label>
-                                <select id="start_hour" class="form-control" disabled>
-                                    <option selected>{{ $assessment_event->start_hour }}</option>
-                                </select>
-                            </div>
-                            {{-- start_hour --}}
-
-                            {{-- start_minute --}}
-                            <div class="form-group col-md-3">
-                                <label for="start_minute">Start Minute</label>
-                                <select id="start_minute" class="form-control" disabled>
-                                    <option selected>{{ $assessment_event->start_minute }}</option>
-                                </select>
-                            </div>
-                            {{-- start_minute --}}
-
+                        <!--start_time-->
+                        <div class="form-group">
+                            <label for="group_id">Start Time</label>
+                            <select class="form-control" id="group_id" disabled>
+                                <option>{{ $assessment_event->start_time }}</option>
+                            </select>
                         </div>
+                        <!--/start_time-->
 
                         <div class="form-row">
 
