@@ -45,11 +45,11 @@ class AssessmentEventObserver
         }
 
         if ($assessment_event->wasChanged('group_id')) {
-            $logMessages = 'studen group id was changed from ' . $assessment_event->getOriginal('group_id') . ' to ' . $assessment_event->group_id;
+            $logMessages[] = 'studen group id was changed from ' . $assessment_event->getOriginal('group_id') . ' to ' . $assessment_event->group_id;
         }
 
         if ($assessment_event->wasChanged('stop_time')) {
-            $logMessages = 'stop_time was changed from ' . $assessment_event->getOriginal('stop_time') . ' to ' . $assessment_event->stop_time;
+            $logMessages[] = 'stop_time was changed from ' . $assessment_event->getOriginal('stop_time') . ' to ' . $assessment_event->stop_time;
         }
 
         foreach ($logMessages as $logMessage) {
