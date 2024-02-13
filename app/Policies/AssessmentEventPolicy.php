@@ -6,6 +6,7 @@ use App\Models\assessment;
 use App\Models\User;
 use App\Models\assessment_event;
 use App\Models\detailed_score;
+use Carbon\Carbon;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AssessmentEventPolicy
@@ -119,7 +120,19 @@ class AssessmentEventPolicy
      */
     public function update(User $user, assessment_event $assessmentEvent)
     {
-        //
+        if ($user->id !== $assessmentEvent->user_id) {
+            return false;
+        }
+
+        if ($this->delete($user, $assessmentEvent) == false) {
+            $now = Carbon::now();
+            $extendTime = Carbon::createFromFormat(config('datetimeformat.date_time_format'), $assessmentEvent->stop_time)->addDays(config('app.event_extend_limit'));
+            if ($extendTime->lessThan($now)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -131,6 +144,10 @@ class AssessmentEventPolicy
      */
     public function delete(User $user, assessment_event $assessmentEvent)
     {
+        if ($user->id !== $assessmentEvent->user_id) {
+            return false;
+        }
+
         if ($user->department_id !== $assessmentEvent->department_id) {
             return false;
         }

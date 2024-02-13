@@ -217,4 +217,5 @@ return [
     'user_default_role' => env('USER_DEFAULT_ROLE', 'teacher'),
     'allow_user_edit' => env('ALLOW_USER_EDIT', false),
     'chromium_executable' => env('CHROMIUM_EXECUTABLE', 'default'),
+    'event_extend_limit' => env('EVENT_EXTEND_LIMIT', 15),
 ];

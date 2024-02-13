@@ -125,6 +125,16 @@
                                 @endcan
                                 {{-- Download Report --}}
 
+                                {{-- Extend Time --}}
+                                @can('update', $assessment_event)
+                                    <a class="btn btn-outline-info btn-sm mb-2"
+                                        href="{{ route('assessment_events.extend_time.create', ['assessment_event' => $assessment_event]) }}">
+                                        <i class="fas fa-external-link-square-alt"></i>
+                                        Extend Time
+                                    </a>
+                                @endcan
+                                {{-- Extend Time --}}
+
                                 {{-- EDIT & DELETE --}}
                                 @can('delete', $assessment_event)
                                     <a class="btn btn-outline-info btn-sm mb-2"

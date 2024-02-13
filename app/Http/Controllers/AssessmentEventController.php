@@ -6,7 +6,6 @@ use App\Models\assessment_event;
 use App\Models\assessment_event_student;
 use App\Models\assessment_status;
 use App\Models\course;
-use App\Models\log;
 use App\Models\student_group;
 use App\Models\student_group_member;
 use App\Models\User;
@@ -197,30 +196,6 @@ class AssessmentEventController extends Controller
                 $assessment_event_student->name = $student->name;
                 $assessment_event_student->save();
             }
-        }
-
-        // log
-        if ($assessment_event->wasChanged('teacher_id') || $assessment_event->wasChanged('course_id') || $assessment_event->wasChanged('group_id')) {
-            $log_message = '';
-            if ($assessment_event->wasChanged('teacher_id')) {
-                $log_message .= 'teacher id was changed from ' . $assessment_event->getOriginal('teacher_id') . ' to ' . $assessment_event->teacher_id;
-            }
-            if ($assessment_event->wasChanged('course_id')) {
-                $log_message .= ' course id was changed from ' . $assessment_event->getOriginal('course_id') . ' to ' . $assessment_event->course_id;
-            }
-
-            if ($assessment_event->wasChanged('group_id')) {
-                $log_message .= ' studen group id was changed from ' . $assessment_event->getOriginal('group_id') . ' to ' . $assessment_event->group_id;
-            }
-
-            $log = new log();
-            $log->user_id = $request->user()->id;
-            $log->department_id = $request->user()->department_id;
-            $log->topic = 'assessment event updated';
-            $log->log = $log_message;
-            $log->model_type = 'App\Models\assessment_event';
-            $log->model_id = $assessment_event->id;
-            $log->save();
         }
 
         return redirect()->route('assessment_events.index');

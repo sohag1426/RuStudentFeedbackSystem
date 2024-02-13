@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AssessmentEventController;
 use App\Http\Controllers\AssessmentEventStudentController;
+use App\Http\Controllers\AssessmentEventTimeExtendController;
 use App\Http\Controllers\AssessmentStatusController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
@@ -54,6 +55,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::resource('assessment_events', AssessmentEventController::class)->except(['show']);
+    Route::resource('assessment_events.extend_time', AssessmentEventTimeExtendController::class)->only(['create', 'store']);
     Route::resource('assessment_events.assessment_event_students', AssessmentEventStudentController::class)->only(['index', 'create', 'store', 'destroy']);
     Route::resource('student_groups.student_group_members', StudentGroupMemberController::class)->shallow()->except(['show', 'edit', 'update']);
     Route::get('generate-score/{assessment_event}', ScoreGenerateController::class)->name('generate-score');
