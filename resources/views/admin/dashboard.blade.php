@@ -35,7 +35,7 @@
                     @foreach ($departments->sortBy('en_name') as $department)
                         <option value="{{ $department->id }}">
                             {{ $department->en_name }}
-                            (Event Count: {{ $department->events()->count() }})
+                            (Feedback Event Count: {{ $department->events()->count() }})
                         </option>
                     @endforeach
                 </select>
