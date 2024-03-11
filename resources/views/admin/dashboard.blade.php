@@ -29,11 +29,14 @@
         <form class="d-flex align-content-start flex-wrap" action="{{ route('admin-dashboard') }}" method="get">
 
             {{-- department_id --}}
-            <div class="form-group col-md-2">
+            <div class="form-group col-md-6">
                 <select name="department_id" id="department_id" class="form-control">
                     <option value='{{ $selectedDepartment->id }}'>{{ $selectedDepartment->en_name }}</option>
                     @foreach ($departments->sortBy('en_name') as $department)
-                        <option value="{{ $department->id }}">{{ $department->en_name }}</option>
+                        <option value="{{ $department->id }}">
+                            {{ $department->en_name }}
+                            (Event Count: {{ $department->events()->count() }})
+                        </option>
                     @endforeach
                 </select>
             </div>

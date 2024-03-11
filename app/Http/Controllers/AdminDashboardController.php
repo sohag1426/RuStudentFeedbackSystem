@@ -25,6 +25,7 @@ class AdminDashboardController extends Controller
         }
 
         $departments = department::all();
+
         return view('admin.dashboard', [
             'assessment_events' => $assessment_events,
             'departments' => $departments,
