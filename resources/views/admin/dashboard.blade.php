@@ -31,7 +31,7 @@
             {{-- department_id --}}
             <div class="form-group col-md-2">
                 <select name="department_id" id="department_id" class="form-control">
-                    <option value=''>select department</option>
+                    <option value='{{ $selectedDepartment->id }}'>{{ $selectedDepartment->en_name }}</option>
                     @foreach ($departments->sortBy('en_name') as $department)
                         <option value="{{ $department->id }}">{{ $department->en_name }}</option>
                     @endforeach
@@ -66,10 +66,10 @@
                 <tbody>
                     @foreach ($assessment_events as $assessment_event)
                         <tr>
-                            <td scope="row">{{ $assessment_event->id }}</td>
+                            <td scope="row">{{ $loop->iteration }}</td>
                             <td>{{ $assessment_event->teacher->name }}</td>
                             <td>{{ $assessment_event->department->en_name }}</td>
-                            <td>{{ $assessment_event->course->name }}</td>
+                            <td>{{ $assessment_event->course->name }} ({{ $assessment_event->course->code }})</td>
                             <td>{{ $assessment_event->start_time }}</td>
                             <td>{{ $assessment_event->stop_time }}</td>
                             <td>***</td>
