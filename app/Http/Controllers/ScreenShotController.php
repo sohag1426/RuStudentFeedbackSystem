@@ -44,7 +44,12 @@ class ScreenShotController extends Controller
 
             // find and click at an element with given id
             if ($request->filled('cid')) {
-                $page->mouse()->find('#' . $request->cid, 1)->click();
+                $selector = '#' . $request->cid;
+                if (\version_compare(\Composer\InstalledVersions::getVersion('chrome-php/chrome'), '1.14.0', '<')) {
+                    // workaround https://github.com/chrome-php/chrome/security/advisories/GHSA-3432-fmrf-7vmh
+                    $selector = \json_encode($selector, \JSON_THROW_ON_ERROR);
+                }
+                $page->mouse()->find($selector, 1)->click();
             }
 
             // screenshot
