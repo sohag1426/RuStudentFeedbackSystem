@@ -91,7 +91,7 @@ class StudentLoginController extends Controller
 
         $request_data = array(
             "ru_user" => $ru_user,
-            "ru_pass" => md5($ru_pass),
+            "ru_pass" => $ru_pass,
             "key"     => config('verify.key')
         );
 
