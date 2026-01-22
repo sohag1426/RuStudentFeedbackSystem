@@ -58,7 +58,7 @@
         <div class="col-sm">
             <div class="callout callout-warning">
                 <span class="font-weight-bold"> Rating Scale: </span>
-                5 - Excellent, 4 - Good, 3 - Average, 2 - Below Average, 1 - Not Good
+                5 - Excellent (চমৎকার), 4 - Very Good (খুব ভালো), 3 - Good (ভালো), 2 - Fair (মোটামুটি), 1 - Poor (খারাপ)
             </div>
         </div>
     </div>
