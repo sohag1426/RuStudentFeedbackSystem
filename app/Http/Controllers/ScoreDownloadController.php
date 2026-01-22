@@ -6,19 +6,14 @@ use App\Models\assessment_event;
 use App\Models\comment;
 use App\Models\detailed_score;
 use Illuminate\Http\Request;
-use Spatie\SimpleExcel\SimpleExcelWriter;
-use OpenSpout\Common\Entity\Style\Color;
-use OpenSpout\Common\Entity\Style\CellAlignment;
 use OpenSpout\Common\Entity\Style\Style;
-use OpenSpout\Common\Entity\Style\Border;
-use OpenSpout\Common\Entity\Style\BorderPart;
+use Spatie\SimpleExcel\SimpleExcelWriter;
 
 class ScoreDownloadController extends Controller
 {
     /**
      * Handle the incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function __invoke(Request $request, assessment_event $assessment_event)
@@ -43,7 +38,7 @@ class ScoreDownloadController extends Controller
             ])
             ->addRow([
                 'course',
-                $assessment_event->course->name . "(" . $assessment_event->course->code . ")",
+                $assessment_event->course->name.'('.$assessment_event->course->code.')',
             ])
             ->addRow([
                 'score',
@@ -58,12 +53,12 @@ class ScoreDownloadController extends Controller
                 $assessment_event->group_highest,
             ])
             ->addRow([
-                "",
-                "",
+                '',
+                '',
             ])
             ->addRow([
-                "question",
-                "score",
+                'question',
+                'score',
             ], $style);
 
         $detailed_scores = detailed_score::with('question')->where('event_id', $assessment_event->id)->get();
@@ -75,14 +70,14 @@ class ScoreDownloadController extends Controller
             ]);
         }
 
-        $comments = comment::where('event_id',  $assessment_event->id)->get();
+        $comments = comment::where('event_id', $assessment_event->id)->get();
         $writer->addRow([
-            "",
-            ""
+            '',
+            '',
         ]);
 
         $writer->addRow([
-            "comments",
+            'comments',
         ], $style);
 
         foreach ($comments as $comment) {

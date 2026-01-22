@@ -37,6 +37,9 @@ class detailed_score extends Model
      */
     public function question()
     {
-        return $this->belongsTo(question::class, 'question_id', 'id');
+        return $this->belongsTo(question::class, 'question_id', 'id')->withDefault([
+            'en' => '',
+            'bn' => '',
+        ]);
     }
 }
