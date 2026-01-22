@@ -115,6 +115,7 @@
             </div>
         @endforeach
 
+        <!--
         <div class="card card-outline card-dark">
             <div class="card-header">
                 <h3 class="card-title font-weight-bold">
@@ -133,6 +134,7 @@
                 <button type="submit" class="btn btn-primary mt-2">Submit</button>
             </div>
         </div>
+        -->
 
     </form>
 @endsection
