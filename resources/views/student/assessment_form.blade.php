@@ -115,8 +115,9 @@
             </div>
         @endforeach
 
-        <!--
+
         <div class="card card-outline card-dark">
+            <!--
             <div class="card-header">
                 <h3 class="card-title font-weight-bold">
                     <span style="font-size: 18px"> 5. Recommendations/Overall Comments </span>
@@ -130,11 +131,11 @@
                 </label>
                 <textarea class="form-control" id="Textarea1" rows="3" name="comment" maxlength="250"></textarea>
             </div>
+                -->
             <div class="card-footer">
                 <button type="submit" class="btn btn-primary mt-2">Submit</button>
             </div>
         </div>
-        -->
 
     </form>
 @endsection
