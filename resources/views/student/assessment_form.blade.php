@@ -20,7 +20,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-sm">
+        <div class="col-12 col-md-6">
             <div class="callout callout-info">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><span class="font-weight-bold"> Course : </span>
@@ -37,7 +37,7 @@
                 </ul>
             </div>
         </div>
-        <div class="col-sm">
+        <div class="col-12 col-md-6">
             <div class="callout callout-info">
                 <dl>
                     <dt>
@@ -55,10 +55,19 @@
     </div>
 
     <div class="row">
-        <div class="col-sm">
+        <div class="col-12">
             <div class="callout callout-warning">
                 <span class="font-weight-bold"> Rating Scale: </span>
                 5 - Excellent (চমৎকার), 4 - Very Good (খুব ভালো), 3 - Good (ভালো), 2 - Fair (মোটামুটি), 1 - Poor (খারাপ)
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="callout callout-warning">
+                Please be honest, frank and constructive while providing your feedback.
+                (আপনার মতামত প্রদানের সময় দয়া করে সৎ, খোলামেলা এবং গঠনমূলক থাকুন/হউন ।)
             </div>
         </div>
     </div>
