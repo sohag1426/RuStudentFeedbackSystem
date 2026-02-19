@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\StudentLoginController;
-use App\Http\Requests\Auth\LoginRequest;
+use App\Models\log;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log as FacadesLog;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -54,13 +55,25 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        try {
+            $log = new log();
+            $log->user_id = auth()->user()->id;
+            $log->department_id = auth()->user()->department_id;
+            $log->topic = 'Login';
+            $log->log = 'Login successful. Time: '.now().' From IP: '.$request->ip().' Browser : '.$request->userAgent();
+            $log->model_type = 'App\Models\User';
+            $log->model_id = $user->id;
+            $log->save();
+        } catch (\Throwable $th) {
+            FacadesLog::error($th->getMessage());
+        }
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
     /**
      * Destroy an authenticated session.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request)
