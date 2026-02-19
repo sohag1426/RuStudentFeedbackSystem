@@ -56,12 +56,14 @@
                 <!--/Dashboard-->
 
                 {{-- Teachers --}}
+
                 <li class="nav-item">
                     <a href="{{ route('users.index') }}" class="nav-link @if ($menu['1']) active @endif">
                         <i class="fas fa-users-cog"></i>
                         <p>Teachers</p>
                     </a>
                 </li>
+
                 {{-- Teachers --}}
 
                 {{-- Officers/Staffs --}}
@@ -92,21 +94,25 @@
                 {{-- student group --}}
 
                 {{-- questions --}}
+                @if (auth('web')->user()->role != 'DepartmentManager')
                 <li class="nav-item">
                     <a href="{{ route('questions.index') }}" class="nav-link @if ($menu['4']) active @endif">
                         <i class="fas fa-question"></i>
                         <p>Questions For Feedback</p>
                     </a>
                 </li>
+                @endif
                 {{-- questions --}}
 
                 {{-- Feedback events --}}
+                @if (auth('web')->user()->role != 'DepartmentManager')
                 <li class="nav-item">
                     <a href="{{ route('assessment_events.index') }}" class="nav-link @if ($menu['5']) active @endif">
                         <i class="fas fa-calendar-alt"></i>
                         <p>Feedback Events</p>
                     </a>
                 </li>
+                @endif
                 {{-- Feedback events --}}
 
                 {{-- change Logs --}}
