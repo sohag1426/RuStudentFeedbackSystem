@@ -9,6 +9,7 @@ use App\Http\Controllers\AssessmentEventTimeExtendController;
 use App\Http\Controllers\AssessmentStatusController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepartmentManagerController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\SampleExcel;
@@ -40,11 +41,11 @@ Route::resource('assessment_event_students.logout', StudenLogoutController::clas
 Route::resource('assessment_event_students.assessment_events', AssessmentController::class)
     ->only(['index', 'edit', 'update']);
 
-
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::resource('users', UserController::class)->only(['index', 'create', 'store']);
+    Route::resource('department-manager', DepartmentManagerController::class)->only(['index', 'create', 'store']);
     Route::resource('users.profile', UsersProfileEditController::class)->only(['create', 'store']);
     Route::resource('courses', CourseController::class)->except(['show', 'destroy']);
     Route::resource('student_groups', StudentGroupController::class)->except(['show', 'destroy']);
@@ -77,4 +78,4 @@ Route::middleware('auth.admin:admin')->group(function () {
         ->name('admin-logout');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
