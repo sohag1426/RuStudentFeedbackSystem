@@ -22,11 +22,42 @@ class AssessmentEventController extends Controller
      */
     public function index(Request $request)
     {
+        $request->validate([
+            'user_id' => 'nullable|exists:users,id',
+            'course_id' => 'nullable|exists:courses,id',
+        ]);
+
+        $filter = [];
+
+        // default filter
+        $filter['department_id'] = $request->user()->department_id;
+
+        // filter by user
+        if ($request->filled('user_id')) {
+            $filter['user_id'] = $request->user_id;
+        }
+
+        // filter by course
+        if ($request->filled('course_id')) {
+            $filter['course_id'] = $request->course_id;
+        }
+
         $assessment_events = assessment_event::with(['teacher', 'course', 'group'])
-            ->where('department_id', $request->user()->department_id)
+            ->where($filter)
             ->get();
+
+        $users = User::where('department_id', $request->user()->department_id)
+            ->where(function ($query) {
+                $query->where('role', 'DepartmentChair')
+                    ->orWhere('role', 'teacher');
+            })->get();
+
+        $courses = course::where('department_id', $request->user()->department_id)->get();
+
         return view('teacher.assessment_events', [
             'assessment_events' => $assessment_events,
+            'users' => $users,
+            'courses' => $courses,
         ]);
     }
 
@@ -39,12 +70,13 @@ class AssessmentEventController extends Controller
     {
         $teachers = User::where('department_id', $request->user()->department_id)
             ->where(function ($query) {
-                $query->where('role', 'department_admin')
+                $query->where('role', 'DepartmentChair')
                     ->orWhere('role', 'teacher');
             })->get();
 
         $courses = course::where('department_id', $request->user()->department_id)->get();
         $groups = student_group::where('department_id', $request->user()->department_id)->get();
+
         return view('teacher.assessment_events_create', [
             'teachers' => $teachers,
             'courses' => $courses,
@@ -55,7 +87,6 @@ class AssessmentEventController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -117,14 +148,13 @@ class AssessmentEventController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\assessment_event  $assessment_event
      * @return \Illuminate\Http\Response
      */
     public function edit(assessment_event $assessment_event)
     {
         $teachers = User::where('department_id', $assessment_event->department_id)
             ->where(function ($query) {
-                $query->where('role', 'department_admin')
+                $query->where('role', 'DepartmentChair')
                     ->orWhere('role', 'teacher');
             })->get();
 
@@ -142,8 +172,6 @@ class AssessmentEventController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\assessment_event  $assessment_event
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, assessment_event $assessment_event)
@@ -204,7 +232,6 @@ class AssessmentEventController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\assessment_event  $assessment_event
      * @return \Illuminate\Http\Response
      */
     public function destroy(assessment_event $assessment_event)
@@ -218,7 +245,6 @@ class AssessmentEventController extends Controller
     /**
      * Get Assessable Events
      *
-     * @param  \App\Models\assessment_event_student  $assessment_event_student
      * @return \Illuminate\Http\Response
      */
     public static function getFeedbackEvents(assessment_event_student $assessment_event_student): Collection
@@ -230,11 +256,11 @@ class AssessmentEventController extends Controller
         $assessment_events = assessment_event::whereIn('id', $event_ids)
             ->get();
 
-        $notYetSubmittedEvents =  $assessment_events->filter(function (assessment_event $value, int $key) use ($assessment_event_student) {
-            return ($value->stop_time >=  Carbon::now()->format(config('datetimeformat.date_time_format'))) && (assessment_status::where('event_id', $value->id)->where('student_id', $assessment_event_student->student_id)->count() == 0);
+        $notYetSubmittedEvents = $assessment_events->filter(function (assessment_event $value, int $key) use ($assessment_event_student) {
+            return ($value->stop_time >= Carbon::now()->format(config('datetimeformat.date_time_format'))) && (assessment_status::where('event_id', $value->id)->where('student_id', $assessment_event_student->student_id)->count() == 0);
         });
 
-        $submittedEvents =  $assessment_events->filter(function (assessment_event $value, int $key) use ($assessment_event_student) {
+        $submittedEvents = $assessment_events->filter(function (assessment_event $value, int $key) use ($assessment_event_student) {
             return assessment_status::where('event_id', $value->id)->where('student_id', $assessment_event_student->student_id)->count();
         });
 
