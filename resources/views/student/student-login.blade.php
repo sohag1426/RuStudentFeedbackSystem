@@ -50,6 +50,12 @@
                         </li>
 
                         <li class="nav-item ml-2">
+                            <a class="btn btn-outline-info" href="{{ route('staff-login') }}" role="button">
+                                <i class="fas fa-user-cog"></i>Staff Login
+                            </a>
+                        </li>
+
+                        <li class="nav-item ml-2">
                             <a class="btn btn-outline-info" href="https://github.com/sohag1426/RuStudentFeedbackSystem"
                                 role="button">
                                 <i class="fab fa-github"></i> Source Code
@@ -133,8 +139,8 @@
 
                                 {{-- student_id --}}
                                 <div class="input-group mb-3">
-                                    <input type="text" name="student_id" class="form-control"
-                                        placeholder="Student ID" required>
+                                    <input type="text" name="student_id" class="form-control" placeholder="Student ID"
+                                        required>
                                     <div class="input-group-append">
                                         <div class="input-group-text">
                                             <span class="fas fa-user"></span>
@@ -211,30 +217,30 @@
     </script>
 
     @if (session('success'))
-        <script type="text/javascript">
-            Toast.fire({
+    <script type="text/javascript">
+        Toast.fire({
                 icon: 'success',
                 title: '{{ session('success') }}'
             });
-        </script>
+    </script>
     @endif
 
     @if (session('info'))
-        <script type="text/javascript">
-            Toast.fire({
+    <script type="text/javascript">
+        Toast.fire({
                 icon: 'info',
                 title: '{{ session('info') }}'
             });
-        </script>
+    </script>
     @endif
 
     @if (session('error'))
-        <script type="text/javascript">
-            Toast.fire({
+    <script type="text/javascript">
+        Toast.fire({
                 icon: 'error',
                 title: '{{ session('error') }}'
             });
-        </script>
+    </script>
     @endif
 
     <script>

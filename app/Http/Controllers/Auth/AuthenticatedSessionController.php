@@ -23,6 +23,11 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login-v2');
     }
 
+    public function staffLogin()
+    {
+        return view('auth.staff-login');
+    }
+
     /**
      * Handle an incoming authentication request.
      *
