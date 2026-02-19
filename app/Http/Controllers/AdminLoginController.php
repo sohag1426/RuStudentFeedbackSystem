@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log as FacadesLog;
 
 class AdminLoginController extends Controller
 {
@@ -20,7 +22,6 @@ class AdminLoginController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -32,6 +33,20 @@ class AdminLoginController extends Controller
 
         if (Auth::guard('admin')->attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
+
+            try {
+                $log = new log();
+                $log->user_id = auth()->user()->id;
+                $log->department_id = auth()->user()->department_id;
+                $log->topic = 'Login';
+                $log->log = 'Login successful. Time: '.now().' From IP: '.$request->ip().' Browser : '.$request->userAgent();
+                $log->model_type = 'App\Models\Admin';
+                $log->model_id = auth()->user()->id;
+                $log->save();
+            } catch (\Throwable $th) {
+                FacadesLog::error($th->getMessage());
+            }
+
             return redirect()->route('admin-dashboard');
         }
 
@@ -43,7 +58,6 @@ class AdminLoginController extends Controller
     /**
      * Destroy an authenticated session.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request)

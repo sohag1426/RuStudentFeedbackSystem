@@ -31,7 +31,7 @@ class AddAdmin extends Command
     public function handle()
     {
         $user = new Admin();
-        $user->role = 'admin';
+        $user->role = $this->ask('role? admin|SuperAdmin');
         $user->name = $this->ask('name?');
         $user->email = $this->ask('email?');
         $user->email_verified_at = Carbon::now();
