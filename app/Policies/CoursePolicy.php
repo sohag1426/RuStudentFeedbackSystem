@@ -3,8 +3,9 @@
 namespace App\Policies;
 
 use App\Models\assessment_event;
-use App\Models\User;
 use App\Models\course;
+use App\Models\User;
+
 // use Illuminate\Auth\Access\Response;
 
 class CoursePolicy
@@ -46,7 +47,11 @@ class CoursePolicy
             return false;
         }
 
-        return true;
+        if ($user->department_id == $course->department_id) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -58,7 +63,11 @@ class CoursePolicy
             return false;
         }
 
-        return true;
+        if ($user->department_id == $course->department_id) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
