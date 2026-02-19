@@ -36,12 +36,12 @@ class AdminLoginController extends Controller
 
             try {
                 $log = new log();
-                $log->user_id = auth()->user()->id;
-                $log->department_id = auth()->user()->department_id;
+                $log->user_id = auth('admin')->user()->id;
+                $log->department_id = 0;
                 $log->topic = 'Login';
                 $log->log = 'Login successful. Time: '.now().' From IP: '.$request->ip().' Browser : '.$request->userAgent();
                 $log->model_type = 'App\Models\Admin';
-                $log->model_id = auth()->user()->id;
+                $log->model_id = auth('admin')->user()->id;
                 $log->save();
             } catch (\Throwable $th) {
                 FacadesLog::error($th->getMessage());

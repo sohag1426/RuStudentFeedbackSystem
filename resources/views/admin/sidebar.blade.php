@@ -48,16 +48,21 @@
 
                 <!--Dashboard menu[0]-->
                 <li class="nav-item">
-                    <a href="{{ route('admin-dashboard') }}" class="nav-link @if ($menu['0']) active @endif ">
+                    <a href="{{ route('admin-dashboard') }}" class="nav-link @if ($menu['0']) active @endif">
                         <i class="fas fa-palette"></i>
                         <p>Dashboard</p>
                     </a>
                 </li>
                 <!--/Dashboard-->
 
-                @if (auth('admin')->user()->role == 'SuperAdmin')
-
-                @endif
+                {{-- Login History --}}
+                <li class="nav-item">
+                    <a href="{{ route('admin-login-logs') }}" class="nav-link @if ($menu['1']) active @endif">
+                        <i class="fas fa-user-shield"></i>
+                        <p>Login History</p>
+                    </a>
+                </li>
+                {{-- Login History --}}
 
             </ul>
 
