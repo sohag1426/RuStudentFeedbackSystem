@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -18,7 +17,7 @@ class UserController extends Controller
     {
         $users = User::where('department_id', $request->user()->department_id)
             ->where(function ($query) {
-                $query->where('role', 'department_admin')
+                $query->where('role', 'DepartmentChair')
                     ->orWhere('role', 'teacher');
             })->get();
 
@@ -40,25 +39,25 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'internet_id' => 'required|numeric',
+            'name' => 'required|string|max:255',
+            'mobile' => 'required|string',
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => 'required',
         ]);
 
         $user = new User();
-        $user->user_id = $request->user()->id;
+        $user->internet_id = $request->internet_id;
         $user->department_id = $request->user()->department_id;
         $user->role = config('app.user_default_role');
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->mobile = $request->mobile;
         $user->email_verified_at = Carbon::now();
-        $user->password = Hash::make($request->password);
         $user->save();
 
         return redirect()->route('users.index');
@@ -67,38 +66,20 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
     public function edit(User $user)
     {
-        return view('teacher.teachers-edit', [
-            'user' => $user,
-        ]);
+        abort(404);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, User $user)
     {
-        if ($request->email !== $user->email) {
-            if (User::where('email', $request->email)->count()) {
-                return redirect()->route('users.index')->with('error', 'Duplicate Email Address!');
-            }
-        }
-
-        $user->email = $request->email;
-        $user->name = $request->name;
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-        }
-        $user->save();
-
-        return redirect()->route('users.index')->with('success', 'Teacher has been edited successfully!');
+        abort(404);
     }
 }

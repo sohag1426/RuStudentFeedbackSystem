@@ -18,7 +18,7 @@ class DashboardController extends Controller
         }
 
         return match ($request->user()->role) {
-            'teacher', 'department_admin' => view('teacher.dashboard'),
+            'teacher', 'DepartmentChair', 'DepartmentManager' => view('teacher.dashboard'),
             default => 'Not Found',
         };
     }

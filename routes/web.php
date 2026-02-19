@@ -44,7 +44,7 @@ Route::resource('assessment_event_students.assessment_events', AssessmentControl
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
-    Route::resource('users', UserController::class)->only(['index']);
+    Route::resource('users', UserController::class)->only(['index', 'create', 'store']);
     Route::resource('users.profile', UsersProfileEditController::class)->only(['create', 'store']);
     Route::resource('courses', CourseController::class)->except(['show', 'destroy']);
     Route::resource('student_groups', StudentGroupController::class)->except(['show', 'destroy']);

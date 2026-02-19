@@ -7,11 +7,13 @@ use App\Models\assessment_event_student;
 use App\Models\course;
 use App\Models\student_group;
 use App\Models\student_group_member;
+use App\Models\User;
 use App\Observers\AssessmentEventObserver;
 use App\Observers\AssessmentEventStudentObserver;
 use App\Observers\CourseObserver;
 use App\Observers\StudentGroupMemberObserver;
 use App\Observers\StudentGroupObserver;
+use App\Observers\UserObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -37,6 +39,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        User::observe(UserObserver::class);
         course::observe(CourseObserver::class);
         student_group::observe(StudentGroupObserver::class);
         student_group_member::observe(StudentGroupMemberObserver::class);
