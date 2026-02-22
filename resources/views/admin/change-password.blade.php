@@ -50,7 +50,7 @@ $active_link = '0';
         </div>
         @endif
 
-        <form action="{{ route('change-password') }}" method="POST">
+        <form action="{{ route('change-password.store') }}" method="POST">
             @csrf
 
             <div class="form-group">
