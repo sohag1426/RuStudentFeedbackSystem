@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AdminLoginLogsController;
+use App\Http\Controllers\AdminPasswordChangeController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AssessmentEventController;
 use App\Http\Controllers\AssessmentEventStudentController;
@@ -76,6 +77,8 @@ Route::middleware('guest.admin:admin')->group(function () {
 Route::middleware('auth.admin:admin')->group(function () {
     Route::get('/admin-dashboard', [AdminDashboardController::class, 'index'])->name('admin-dashboard');
     Route::get('/admin-login-logs', [AdminLoginLogsController::class, 'index'])->name('admin-login-logs');
+    Route::get('/change-password', [AdminPasswordChangeController::class, 'create'])->name('change-password');
+    Route::post('/change-password', [AdminPasswordChangeController::class, 'store'])->name('change-password');
     Route::post('admin-logout', [AdminLoginController::class, 'destroy'])
         ->name('admin-logout');
 });

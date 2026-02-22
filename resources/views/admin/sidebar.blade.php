@@ -64,6 +64,15 @@
                 </li>
                 {{-- Login History --}}
 
+                {{-- Change Password --}}
+                <li class="nav-item">
+                    <a href="{{ route('change-password') }}" class="nav-link @if ($menu['2']) active @endif">
+                        <i class="fas fa-user-shield"></i>
+                        <p>Change Password</p>
+                    </a>
+                </li>
+                {{-- Change Password --}}
+
             </ul>
 
         </nav>
