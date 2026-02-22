@@ -37,7 +37,7 @@ class AuthenticatedSessionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'internet_id' => 'required|numeric',
+            'internet_id' => 'required|string',
             'password' => 'required|string',
         ]);
 
