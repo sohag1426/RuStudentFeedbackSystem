@@ -37,7 +37,7 @@
                     @csrf
 
                     <div class="input-group mb-3">
-                        <input id="internet_id " type="number" name="internet_id" class="form-control"
+                        <input id="internet_id " type="text" name="internet_id" class="form-control"
                             placeholder="Internet ID " required>
                         <div class="input-group-append">
                             <div class="input-group-text">
