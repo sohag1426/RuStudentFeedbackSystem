@@ -43,10 +43,6 @@ class CoursePolicy
      */
     public function update(User $user, course $course): bool
     {
-        if (assessment_event::where('department_id', $user->department_id)->where('course_id', $course->id)->count()) {
-            return false;
-        }
-
         if ($user->department_id == $course->department_id) {
             return true;
         }
