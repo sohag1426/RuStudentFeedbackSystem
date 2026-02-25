@@ -50,7 +50,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::resource('department-manager', DepartmentManagerController::class)->only(['index', 'create', 'store']);
     Route::resource('users.profile', UsersProfileEditController::class)->only(['create', 'store']);
     Route::resource('courses', CourseController::class)->except(['show', 'destroy']);
-    Route::resource('student_groups', StudentGroupController::class)->except(['show', 'destroy']);
+    Route::resource('student_groups', StudentGroupController::class)->except(['show']);
     Route::resource('questions', QuestionController::class)->only(['index']);
     Route::resource('assessment_events.status', AssessmentStatusController::class)->only('index');
     Route::get('sample-excel', SampleExcel::class)->name('sample-excel');

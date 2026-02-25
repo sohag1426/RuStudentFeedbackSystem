@@ -35,7 +35,6 @@ class StudentGroupController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -56,7 +55,6 @@ class StudentGroupController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\student_group  $student_group
      * @return \Illuminate\Http\Response
      */
     public function edit(student_group $student_group)
@@ -69,8 +67,6 @@ class StudentGroupController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\student_group  $student_group
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, student_group $student_group)
@@ -85,7 +81,7 @@ class StudentGroupController extends Controller
         // log
         if ($student_group->wasChanged('name')) {
             if ($student_group->wasChanged('name')) {
-                $log_message = 'student group name was changed from ' . $student_group->getOriginal('name') . ' to ' . $student_group->name;
+                $log_message = 'student group name was changed from '.$student_group->getOriginal('name').' to '.$student_group->name;
             }
             $log = new log();
             $log->user_id = $request->user()->id;

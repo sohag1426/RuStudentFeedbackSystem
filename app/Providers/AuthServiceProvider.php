@@ -6,11 +6,13 @@ use App\Models\assessment_event;
 use App\Models\assessment_event_student;
 use App\Models\assessment_status;
 use App\Models\course;
+use App\Models\student_group;
 use App\Models\student_group_member;
 use App\Models\User;
 use App\Policies\AssessmentEventPolicy;
 use App\Policies\CoursePolicy;
 use App\Policies\StudentGroupMemberPolicy;
+use App\Policies\StudentGroupPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -26,6 +28,7 @@ class AuthServiceProvider extends ServiceProvider
         assessment_event::class => AssessmentEventPolicy::class,
         student_group_member::class => StudentGroupMemberPolicy::class,
         course::class => CoursePolicy::class,
+        student_group::class => StudentGroupPolicy::class,
     ];
 
     /**
@@ -39,6 +42,7 @@ class AuthServiceProvider extends ServiceProvider
             if (assessment_status::where('event_id', $assessment_event->id)->where('student_id', $assessment_event_student->student_id)->count()) {
                 return false;
             }
+
             return true;
         });
     }
