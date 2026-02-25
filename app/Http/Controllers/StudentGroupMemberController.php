@@ -13,7 +13,6 @@ class StudentGroupMemberController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  \App\Models\student_group  $student_group
      * @return \Illuminate\Http\Response
      */
     public function index(student_group $student_group)
@@ -24,7 +23,6 @@ class StudentGroupMemberController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param  \App\Models\student_group  $student_group
      * @return \Illuminate\Http\Response
      */
     public function create(student_group $student_group)
@@ -35,8 +33,6 @@ class StudentGroupMemberController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\student_group  $student_group
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request, student_group $student_group)
@@ -61,6 +57,11 @@ class StudentGroupMemberController extends Controller
             if (count($key_diff)) {
                 continue;
             }
+
+            if (student_group_member::where('group_id', $student_group->id)->where('student_id', $row['student_id'])->exists()) {
+                continue;
+            }
+
             student_group_member::updateOrCreate(
                 ['department_id' => $request->user()->department_id, 'group_id' => $student_group->id, 'student_id' => trim($row['student_id'])],
                 ['name' => trim($row['name'])]
@@ -76,7 +77,6 @@ class StudentGroupMemberController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\student_group  $student_group
-     * @param  \App\Models\student_group_member  $student_group_member
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, student_group_member $student_group_member)
