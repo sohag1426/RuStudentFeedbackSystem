@@ -79,6 +79,7 @@ class ScoreDownloadController extends Controller
 
         $writer->addRow([
             'Questions Group',
+            'Average Score',
         ], $style);
 
         $questions = question::all();
