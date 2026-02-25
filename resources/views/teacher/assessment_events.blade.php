@@ -108,7 +108,7 @@
                         <th scope="col">Stop Time</th>
                         <th scope="col">Created By</th>
                         <th scope="col">Score</th>
-                        <th scope="col">Feddback %</th>
+                        <th scope="col">Feedback %</th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
