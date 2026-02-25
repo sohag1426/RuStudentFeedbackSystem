@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\assessment_event;
 use App\Models\comment;
 use App\Models\detailed_score;
+use App\Models\question;
 use App\Models\questions_group;
 use Illuminate\Http\Request;
 use OpenSpout\Common\Entity\Style\Style;
@@ -80,7 +81,8 @@ class ScoreDownloadController extends Controller
             'Questions Group',
         ], $style);
 
-        $groups = $detailed_scores->groupBy('questions_group_id');
+        $questions = question::all();
+        $groups = $questions->groupBy('questions_group_id');
 
         foreach ($groups as $questionsGroupId => $group) {
             $questionsGroup = questions_group::find($questionsGroupId);
@@ -93,7 +95,11 @@ class ScoreDownloadController extends Controller
                 continue;
             }
 
-            $totalScore = $group->sum('score');
+            $groupScroes = $detailed_scores->filter(function ($detailed_score) use ($group) {
+                return $group->contains('id', $detailed_score->question_id);
+            });
+
+            $totalScore = $groupScroes->sum('score');
             $averageScore = round($totalScore / $questionsCount, 2);
 
             $writer->addRow([
