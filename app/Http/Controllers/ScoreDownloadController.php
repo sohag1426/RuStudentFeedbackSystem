@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\assessment_event;
 use App\Models\comment;
 use App\Models\detailed_score;
+use App\Models\questions_group;
 use Illuminate\Http\Request;
 use OpenSpout\Common\Entity\Style\Style;
 use Spatie\SimpleExcel\SimpleExcelWriter;
@@ -70,6 +71,38 @@ class ScoreDownloadController extends Controller
             ]);
         }
 
+        $writer->addRow([
+            '',
+            '',
+        ]);
+
+        $writer->addRow([
+            'Questions Group',
+        ], $style);
+
+        $groups = $detailed_scores->groupBy('questions_group_id');
+
+        foreach ($groups as $questionsGroupId => $group) {
+            $questionsGroup = questions_group::find($questionsGroupId);
+            if (! $questionsGroup) {
+                continue;
+            }
+
+            $questionsCount = $group->count();
+            if ($questionsCount == 0) {
+                continue;
+            }
+
+            $totalScore = $group->sum('score');
+            $averageScore = round($totalScore / $questionsCount, 2);
+
+            $writer->addRow([
+                $questionsGroup->en_name,
+                $averageScore,
+            ]);
+        }
+
+        /*
         $comments = comment::where('event_id', $assessment_event->id)->get();
         $writer->addRow([
             '',
@@ -85,6 +118,7 @@ class ScoreDownloadController extends Controller
                 'comment' => $comment->comment,
             ]);
         }
+        */
 
         $writer->toBrowser();
     }
