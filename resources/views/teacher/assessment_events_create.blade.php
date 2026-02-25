@@ -47,6 +47,7 @@
                         <div class="form-group">
                             <label for="teacher_id">Teacher</label>
                             <select class="form-control" id="teacher_id" name="teacher_id" required>
+                                <option value="">Please select...</option>
                                 @foreach ($teachers as $teacher)
                                     <option value="{{ $teacher->id }}" selected> {{ $teacher->name }}</option>
                                 @endforeach
