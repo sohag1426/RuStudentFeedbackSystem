@@ -11,7 +11,6 @@ class AssessmentStatusController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  \App\Models\assessment_event  $assessment_event
      * @return \Illuminate\Http\Response
      */
     public function index(assessment_event $assessment_event)
