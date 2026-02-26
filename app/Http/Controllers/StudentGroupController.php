@@ -43,6 +43,10 @@ class StudentGroupController extends Controller
             'name' => 'required|string',
         ]);
 
+        if (student_group::where('department_id', $request->user()->department_id)->where('name', $request->name)->exists()) {
+            return redirect()->route('student_groups.index')->with('info', 'Duplicate Student Group Name');
+        }
+
         $student_group = new student_group();
         $student_group->user_id = $request->user()->id;
         $student_group->department_id = $request->user()->department_id;
@@ -74,6 +78,10 @@ class StudentGroupController extends Controller
         $request->validate([
             'name' => 'required|string',
         ]);
+
+        if (student_group::where('department_id', $request->user()->department_id)->where('name', $request->name)->exists()) {
+            return redirect()->route('student_groups.index')->with('info', 'Duplicate Student Group Name');
+        }
 
         $student_group->name = $request->name;
         $student_group->save();
