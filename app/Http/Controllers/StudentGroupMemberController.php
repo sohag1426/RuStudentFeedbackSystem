@@ -17,7 +17,10 @@ class StudentGroupMemberController extends Controller
      */
     public function index(student_group $student_group)
     {
-        return view('teacher.group-members', ['student_group_members' => $student_group->members]);
+        return view('teacher.group-members', [
+            'student_group' => $student_group,
+            'student_group_members' => $student_group->members,
+        ]);
     }
 
     /**
@@ -85,6 +88,6 @@ class StudentGroupMemberController extends Controller
             $student_group_member->delete();
         }
 
-        return redirect()->route('student_groups.index');
+        return redirect()->route('student_groups.student_group_members.index', ['student_group' => $student_group_member->group_id]);
     }
 }

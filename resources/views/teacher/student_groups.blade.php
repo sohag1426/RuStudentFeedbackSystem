@@ -83,8 +83,8 @@
                                 {{-- Edit --}}
 
                                 {{-- Students --}}
-                                <a class="btn btn-outline-info btn-sm mb-2" href="#"
-                                    onclick="showGroupMembers('{{ route('student_groups.student_group_members.index', ['student_group' => $student_group]) }}')">
+                                <a class="btn btn-outline-info btn-sm mb-2"
+                                    href="{{ route('student_groups.student_group_members.index', ['student_group' => $student_group]) }}">
                                     <i class="fas fa-expand"></i>
                                     Students
                                 </a>
