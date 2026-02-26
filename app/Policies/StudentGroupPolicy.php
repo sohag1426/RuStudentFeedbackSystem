@@ -2,7 +2,9 @@
 
 namespace App\Policies;
 
+use App\Models\assessment_event;
 use App\Models\student_group;
+use App\Models\student_group_member;
 use App\Models\User;
 
 class StudentGroupPolicy
@@ -44,6 +46,14 @@ class StudentGroupPolicy
      */
     public function delete(User $user, student_group $studentGroup): bool
     {
+        if (student_group_member::where('group_id', $studentGroup->id)->exists()) {
+            return false;
+        }
+
+        if (assessment_event::where('department_id', $user->department_id)->where('group_id', $studentGroup->id)->exists()) {
+            return false;
+        }
+
         return $user->department_id == $studentGroup->department_id;
     }
 

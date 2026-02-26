@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\log;
 use App\Models\student_group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class StudentGroupController extends Controller
 {
@@ -102,5 +103,30 @@ class StudentGroupController extends Controller
         }
 
         return redirect()->route('student_groups.index');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Request $request, student_group $student_group)
+    {
+        Gate::authorize('delete', $student_group);
+
+        // Delete the student group
+        $student_group->delete();
+
+        // Log the deletion
+        $log = new log();
+        $log->user_id = $request->user()->id;
+        $log->department_id = $request->user()->department_id;
+        $log->topic = 'student group deleted';
+        $log->log = 'student group deleted: '.$student_group->name;
+        $log->model_type = 'App\Models\student_group';
+        $log->model_id = $student_group->id;
+        $log->save();
+
+        return redirect()->route('student_groups.index')->with('success', 'Student group deleted successfully');
     }
 }
