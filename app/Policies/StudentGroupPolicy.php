@@ -50,9 +50,9 @@ class StudentGroupPolicy
         //     return false;
         // }
 
-        if (assessment_event::where('department_id', $user->department_id)->where('group_id', $studentGroup->id)->exists()) {
-            return false;
-        }
+        // if (assessment_event::where('department_id', $user->department_id)->where('group_id', $studentGroup->id)->exists()) {
+        //     return false;
+        // }
 
         return $user->department_id == $studentGroup->department_id && $user->role == 'DepartmentManager';
     }
