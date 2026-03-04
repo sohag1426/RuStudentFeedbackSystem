@@ -14,14 +14,19 @@ class AdminDashboardController extends Controller
     public function index(Request $request)
     {
         if ($request->filled('department_id')) {
-            $assessment_events = assessment_event::with(['teacher', 'course', 'group'])->where('department_id', $request->department_id)->orderBy('id', 'desc')->paginate(20);
-            $selectedDepartment =  department::find($request->department_id);
+            $assessment_events = assessment_event::with(['teacher', 'course', 'group'])
+                ->where('department_id', $request->department_id)
+                ->orderBy('id', 'desc')
+                ->paginate(50)
+                ->withQueryString();
+
+            $selectedDepartment = department::find($request->department_id);
         } else {
-            $assessment_events = assessment_event::with(['teacher', 'course', 'group'])->orderBy('id', 'desc')->paginate(20);
-            $selectedDepartment =  department::make([
-                'id' => '',
-                'en_name' => 'select department'
-            ]);
+            $assessment_events = assessment_event::with(['teacher', 'course', 'group'])
+                ->orderBy('id', 'desc')
+                ->paginate(20);
+
+            $selectedDepartment = null;
         }
 
         $departments = department::all();
@@ -29,7 +34,7 @@ class AdminDashboardController extends Controller
         return view('admin.dashboard', [
             'assessment_events' => $assessment_events,
             'departments' => $departments,
-            'selectedDepartment' => $selectedDepartment
+            'selectedDepartment' => $selectedDepartment,
         ]);
     }
 }
