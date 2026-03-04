@@ -14,8 +14,15 @@ class AdminDashboardController extends Controller
     public function index(Request $request)
     {
         if ($request->filled('department_id')) {
+            // filter
+            $filter = [];
+            $filter[] = ['department_id', '=', $request->department_id];
+            if ($request->filled('group_id')) {
+                $filter[] = ['group_id', '=', $request->group_id];
+            }
+
             $assessment_events = assessment_event::with(['teacher', 'course', 'group'])
-                ->where('department_id', $request->department_id)
+                ->where($filter)
                 ->orderBy('id', 'desc')
                 ->paginate(50)
                 ->withQueryString();
