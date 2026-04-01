@@ -85,7 +85,7 @@ $active_link = '1';
                         <div class='form-group col-md-6'>
                             <label for='datepicker'>Start Date</label>
                             <input type='text' name='start_date' id='datepicker' class='form-control'
-                                value="{{ date('Y-m-d') }}" required>
+                                value="{{ date('m/d/Y') }}" required>
                         </div>
                         <!--/start_date-->
 
@@ -119,7 +119,7 @@ $active_link = '1';
                         <div class='form-group col-md-6'>
                             <label for='datepicker2'>Stop Date</label>
                             <input type='text' name='stop_date' id='datepicker2' class='form-control'
-                                value="{{ date('Y-m-d') }}" required>
+                                value="{{ date('m/d/Y') }}" required>
                         </div>
                         <!--/stop_date-->
 
