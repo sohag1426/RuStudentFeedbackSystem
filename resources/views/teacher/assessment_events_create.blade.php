@@ -166,17 +166,10 @@ $active_link = '1';
 @section('pageJs')
 <script>
     $(function() {
-            $('#datepicker').datepicker({
-                autoclose: !0,
-                format: 'yyyy-mm-dd'
-            });
+        $('#datepicker, #datepicker2').datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd' 
         });
-
-        $(function() {
-            $('#datepicker2').datepicker({
-                autoclose: !0,
-                format: 'yyyy-mm-dd'
-            });
-        });
+    });
 </script>
 @endsection
