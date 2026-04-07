@@ -23,7 +23,7 @@ class AssessmentEventController extends Controller
     public function index(Request $request)
     {
         $request->validate([
-            'user_id' => 'nullable|exists:users,id',
+            'teacher_id' => 'nullable|exists:users,id',
             'course_id' => 'nullable|exists:courses,id',
         ]);
 
@@ -32,9 +32,9 @@ class AssessmentEventController extends Controller
         // default filter
         $filter['department_id'] = $request->user()->department_id;
 
-        // filter by user
-        if ($request->filled('user_id')) {
-            $filter['user_id'] = $request->user_id;
+        // filter by teacher_id
+        if ($request->filled('teacher_id')) {
+            $filter['teacher_id'] = $request->teacher_id;
         }
 
         // filter by course
@@ -120,7 +120,7 @@ class AssessmentEventController extends Controller
             return redirect()->route('assessment_events.create')->with('info', 'It is not possible to stop before the start time.');
         }
 
-        $assessment_event = new assessment_event();
+        $assessment_event = new assessment_event;
         $assessment_event->user_id = $request->user()->id;
         $assessment_event->department_id = $request->user()->department_id;
         $assessment_event->teacher_id = $request->teacher_id;
@@ -133,7 +133,7 @@ class AssessmentEventController extends Controller
         // assessment_event_students
         $student_group_members = student_group_member::where('group_id', $assessment_event->group_id)->get();
         foreach ($student_group_members as $student) {
-            $assessment_event_student = new assessment_event_student();
+            $assessment_event_student = new assessment_event_student;
             $assessment_event_student->event_id = $assessment_event->id;
             $assessment_event_student->department_id = $student->department_id;
             $assessment_event_student->group_id = $student->group_id;
@@ -216,7 +216,7 @@ class AssessmentEventController extends Controller
             assessment_event_student::where('event_id', $assessment_event->id)->delete();
             $student_group_members = student_group_member::where('group_id', $assessment_event->group_id)->get();
             foreach ($student_group_members as $student) {
-                $assessment_event_student = new assessment_event_student();
+                $assessment_event_student = new assessment_event_student;
                 $assessment_event_student->event_id = $assessment_event->id;
                 $assessment_event_student->department_id = $student->department_id;
                 $assessment_event_student->group_id = $student->group_id;

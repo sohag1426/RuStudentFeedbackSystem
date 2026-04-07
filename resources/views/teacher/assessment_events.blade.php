@@ -62,9 +62,9 @@
             <form class="d-flex align-content-start flex-wrap" action="{{ route('assessment_events.index') }}"
                 method="get">
 
-                {{-- user_id --}}
+                {{-- teacher_id --}}
                 <div class="form-group col-md-4">
-                    <select name="user_id" id="user_id" class="form-control">
+                    <select name="teacher_id" id="teacher_id" class="form-control">
                         <option value=''>Teacher...</option>
                         @foreach ($users->sortBy('name') as $user)
                             <option value="{{ $user->id }}">
@@ -73,7 +73,7 @@
                         @endforeach
                     </select>
                 </div>
-                {{-- user_id --}}
+                {{-- teacher_id --}}
 
                 {{-- course_id --}}
                 <div class="form-group col-md-4">
