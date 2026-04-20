@@ -20,6 +20,10 @@ class AssessmentEventPolicy
      */
     public function generateReport(User $user, assessment_event $assessmentEvent)
     {
+        if ($user->role == 'DepartmentChair' && $user->department_id == $assessmentEvent->department_id) {
+            return true;
+        }
+
         if ($user->department_id !== $assessmentEvent->department_id) {
             return false;
         }
