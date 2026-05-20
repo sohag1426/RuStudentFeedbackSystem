@@ -93,7 +93,7 @@ class AssessmentEventPolicy
         }
 
         if ($user->role == 'DepartmentChair' && $user->department_id == $assessmentEvent->department_id) {
-            return true;
+            return false;
         }
 
         return false;
