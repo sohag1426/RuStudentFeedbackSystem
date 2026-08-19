@@ -33,6 +33,7 @@ class AdminReportController extends Controller
     {
         $events = assessment_event::where('department_id', $department->id)
             ->with(['teacher', 'course'])
+            ->orderBy('teacher_id')
             ->get();
             
         if ($events->isEmpty()) {
