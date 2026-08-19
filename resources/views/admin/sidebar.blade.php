@@ -55,6 +55,21 @@
                 </li>
                 <!--/Dashboard-->
 
+                {{-- Reports --}}
+                <li class="nav-item">
+                    <a href="{{ route('admin-reports.by-department') }}" class="nav-link @if (request()->routeIs('admin-reports.by-department')) active @endif">
+                        <i class="fas fa-building"></i>
+                        <p>Report By Department</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin-reports.by-teacher') }}" class="nav-link @if (request()->routeIs('admin-reports.by-teacher')) active @endif">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <p>Report By Teacher</p>
+                    </a>
+                </li>
+                {{-- Reports --}}
+
                 {{-- Login History --}}
                 <li class="nav-item">
                     <a href="{{ route('admin-login-logs') }}" class="nav-link @if ($menu['1']) active @endif">

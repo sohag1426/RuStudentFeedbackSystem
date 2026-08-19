@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AdminLoginLogsController;
 use App\Http\Controllers\AdminPasswordChangeController;
+use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AssessmentEventController;
 use App\Http\Controllers\AssessmentEventStudentController;
@@ -77,6 +78,10 @@ Route::middleware('guest.admin:admin')->group(function () {
 
 Route::middleware('auth.admin:admin')->group(function () {
     Route::get('/admin-dashboard', [AdminDashboardController::class, 'index'])->name('admin-dashboard');
+    Route::get('/admin-reports/department', [AdminReportController::class, 'departmentIndex'])->name('admin-reports.by-department');
+    Route::get('/admin-reports/department/{department}/download', [AdminReportController::class, 'departmentDownload'])->name('admin-reports.department.download');
+    Route::get('/admin-reports/teacher', [AdminReportController::class, 'teacherIndex'])->name('admin-reports.by-teacher');
+    Route::get('/admin-reports/teacher/{teacher}/download', [AdminReportController::class, 'teacherDownload'])->name('admin-reports.teacher.download');
     Route::get('/admin-login-logs', [AdminLoginLogsController::class, 'index'])->name('admin-login-logs');
     Route::get('/change-password', [AdminPasswordChangeController::class, 'create'])->name('change-password');
     Route::post('/change-password', [AdminPasswordChangeController::class, 'store'])->name('change-password.store');
