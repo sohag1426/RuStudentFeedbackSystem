@@ -6,6 +6,7 @@ use App\Models\log;
 use App\Models\student_group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Spatie\SimpleExcel\SimpleExcelWriter;
 
 class StudentGroupController extends Controller
 {
@@ -128,5 +129,25 @@ class StudentGroupController extends Controller
         $log->save();
 
         return redirect()->route('student_groups.index')->with('success', 'Student group deleted successfully');
+    }
+
+    /**
+     * Export the specified resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function export(student_group $student_group)
+    {
+        $fileName = 'students-' . $student_group->name . '.xlsx';
+        $writer = SimpleExcelWriter::streamDownload($fileName);
+
+        foreach ($student_group->members as $member) {
+            $writer->addRow([
+                'student_id' => $member->student_id,
+                'name' => $member->name,
+            ]);
+        }
+
+        return $writer->toBrowser();
     }
 }

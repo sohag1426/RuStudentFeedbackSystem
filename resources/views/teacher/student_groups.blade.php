@@ -98,6 +98,14 @@ $active_link = '1';
                         </a>
                         {{-- Add Students --}}
 
+                        {{-- Export Students --}}
+                        <a class="btn btn-outline-success btn-sm mb-2"
+                            href="{{ route('student_groups.export', ['student_group' => $student_group]) }}">
+                            <i class="fas fa-download"></i>
+                            Export Students
+                        </a>
+                        {{-- Export Students --}}
+
                         @can('delete', $student_group)
                         <form method="POST"
                             action="{{ route('student_groups.destroy', ['student_group' => $student_group]) }}"
