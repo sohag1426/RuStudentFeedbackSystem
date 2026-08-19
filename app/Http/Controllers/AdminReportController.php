@@ -35,6 +35,16 @@ class AdminReportController extends Controller
             ->with(['teacher', 'course'])
             ->get();
             
+        if ($events->isEmpty()) {
+            return back()->with('error', 'No assessment events found for this department.');
+        }
+
+        foreach ($events as $event) {
+            if ($event->score === 'undefined') {
+                \App\Services\ScoreService::generateScore($event);
+            }
+        }
+            
         $pdf = Pdf::loadView('admin.reports.pdf_department', compact('department', 'events'));
         return $pdf->download('report-department-' . $department->en_name . '.pdf');
     }
@@ -44,6 +54,16 @@ class AdminReportController extends Controller
         $events = assessment_event::where('teacher_id', $teacher->id)
             ->with(['department', 'course'])
             ->get();
+            
+        if ($events->isEmpty()) {
+            return back()->with('error', 'No assessment events found for this teacher.');
+        }
+
+        foreach ($events as $event) {
+            if ($event->score === 'undefined') {
+                \App\Services\ScoreService::generateScore($event);
+            }
+        }
             
         $pdf = Pdf::loadView('admin.reports.pdf_teacher', compact('teacher', 'events'));
         return $pdf->download('report-teacher-' . $teacher->name . '.pdf');

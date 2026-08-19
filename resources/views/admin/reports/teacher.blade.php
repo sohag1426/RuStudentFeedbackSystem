@@ -13,6 +13,14 @@ Report By Teacher
 @endsection
 
 @section('content')
+@if (session('error'))
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ session('error') }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+@endif
 <div class="card mb-3">
     <div class="card-body">
         <form method="GET" action="{{ route('admin-reports.by-teacher') }}" class="form-inline">
