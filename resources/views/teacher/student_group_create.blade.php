@@ -50,6 +50,44 @@
                         </div>
                         <!--/name-->
 
+                        <!--year-->
+                        <div class="form-group">
+                            <label for="year"><span class="text-danger">*</span>Year</label>
+                            <select name="year" id="year" class="form-control @error('year') is-invalid @enderror" required>
+                                <option value="">Select Year</option>
+                                @foreach ($years ?? \App\Enums\Year::cases() as $yearOption)
+                                    <option value="{{ $yearOption->value }}" {{ old('year') == $yearOption->value ? 'selected' : '' }}>
+                                        {{ $yearOption->value }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('year')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                        <!--/year-->
+
+                        <!--semester-->
+                        <div class="form-group">
+                            <label for="semester"><span class="text-danger">*</span>Semester</label>
+                            <select name="semester" id="semester" class="form-control @error('semester') is-invalid @enderror" required>
+                                <option value="">Select Semester</option>
+                                @foreach ($semesters ?? \App\Enums\Semester::cases() as $semesterOption)
+                                    <option value="{{ $semesterOption->value }}" {{ old('semester') == $semesterOption->value ? 'selected' : '' }}>
+                                        {{ $semesterOption->value }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('semester')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                        <!--/semester-->
+
                         <button type="submit" class="btn btn-dark">Submit</button>
 
                     </form>

@@ -51,7 +51,7 @@
                     <div class="callout callout-info">
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item"><span class="font-weight-bold"> Group Name : </span>
-                                {{ $student_group->name }}
+                                {{ $student_group->display_name }}
                             </li>
                             <li class="list-group-item"><span class="font-weight-bold"> Total Students : </span>
                                 {{ $student_group_members->count() }} </li>

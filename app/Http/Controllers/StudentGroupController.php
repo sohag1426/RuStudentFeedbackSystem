@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Semester;
+use App\Enums\Year;
 use App\Models\log;
 use App\Models\student_group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rules\Enum;
 use Spatie\SimpleExcel\SimpleExcelWriter;
 
 class StudentGroupController extends Controller
@@ -31,7 +34,10 @@ class StudentGroupController extends Controller
      */
     public function create()
     {
-        return view('teacher.student_group_create');
+        return view('teacher.student_group_create', [
+            'years' => Year::cases(),
+            'semesters' => Semester::cases(),
+        ]);
     }
 
     /**
@@ -43,16 +49,24 @@ class StudentGroupController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
+            'year' => ['required', new Enum(Year::class)],
+            'semester' => ['required', new Enum(Semester::class)],
         ]);
 
-        if (student_group::where('department_id', $request->user()->department_id)->where('name', $request->name)->exists()) {
-            return redirect()->route('student_groups.index')->with('info', 'Duplicate Student Group Name');
+        if (student_group::where('department_id', $request->user()->department_id)
+            ->where('name', $request->name)
+            ->where('year', $request->year)
+            ->where('semester', $request->semester)
+            ->exists()) {
+            return redirect()->route('student_groups.index')->with('info', 'Duplicate Student Group');
         }
 
         $student_group = new student_group();
         $student_group->user_id = $request->user()->id;
         $student_group->department_id = $request->user()->department_id;
         $student_group->name = $request->name;
+        $student_group->year = $request->year;
+        $student_group->semester = $request->semester;
         $student_group->save();
 
         return redirect()->route('student_groups.index');
@@ -67,6 +81,8 @@ class StudentGroupController extends Controller
     {
         return view('teacher.student_group_edit', [
             'student_group' => $student_group,
+            'years' => Year::cases(),
+            'semesters' => Semester::cases(),
         ]);
     }
 
@@ -79,20 +95,29 @@ class StudentGroupController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
+            'year' => ['required', new Enum(Year::class)],
+            'semester' => ['required', new Enum(Semester::class)],
         ]);
 
-        if (student_group::where('department_id', $request->user()->department_id)->where('name', $request->name)->exists()) {
-            return redirect()->route('student_groups.index')->with('info', 'Duplicate Student Group Name');
+        if (student_group::where('department_id', $request->user()->department_id)
+            ->where('name', $request->name)
+            ->where('year', $request->year)
+            ->where('semester', $request->semester)
+            ->where('id', '!=', $student_group->id)
+            ->exists()) {
+            return redirect()->route('student_groups.index')->with('info', 'Duplicate Student Group');
         }
 
+        $oldName = $student_group->name;
+
         $student_group->name = $request->name;
+        $student_group->year = $request->year;
+        $student_group->semester = $request->semester;
         $student_group->save();
 
         // log
-        if ($student_group->wasChanged('name')) {
-            if ($student_group->wasChanged('name')) {
-                $log_message = 'student group name was changed from '.$student_group->getOriginal('name').' to '.$student_group->name;
-            }
+        if ($student_group->wasChanged(['name', 'year', 'semester'])) {
+            $log_message = 'student group was changed from ' . $oldName . ' to ' . $student_group->name;
             $log = new log();
             $log->user_id = $request->user()->id;
             $log->department_id = $request->user()->department_id;
@@ -123,7 +148,7 @@ class StudentGroupController extends Controller
         $log->user_id = $request->user()->id;
         $log->department_id = $request->user()->department_id;
         $log->topic = 'student group deleted';
-        $log->log = 'student group deleted: '.$student_group->name;
+        $log->log = 'student group deleted: ' . ($student_group->year && $student_group->semester ? $student_group->year . ', ' . $student_group->semester : $student_group->name);
         $log->model_type = 'App\Models\student_group';
         $log->model_id = $student_group->id;
         $log->save();
@@ -138,7 +163,8 @@ class StudentGroupController extends Controller
      */
     public function export(student_group $student_group)
     {
-        $fileName = 'students-' . $student_group->name . '.xlsx';
+        $groupTitle = $student_group->year && $student_group->semester ? $student_group->year . '-' . $student_group->semester : $student_group->name;
+        $fileName = 'students-' . $groupTitle . '.xlsx';
         $writer = SimpleExcelWriter::streamDownload($fileName);
 
         foreach ($student_group->members as $member) {

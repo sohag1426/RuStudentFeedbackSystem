@@ -120,7 +120,7 @@
                             <td>
                                 {{ $assessment_event->course->name }} ({{ $assessment_event->course->code }})
                             </td>
-                            <td>{{ $assessment_event->group->name }}</td>
+                            <td>{{ $assessment_event->group->display_name }}</td>
                             <td>{{ $assessment_event->start_time }}</td>
                             <td>{{ $assessment_event->stop_time }}</td>
                             <td>{{ $assessment_event->user->name }}</td>

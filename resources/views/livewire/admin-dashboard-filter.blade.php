@@ -28,7 +28,7 @@
                 @if ($student_groups)
                     @foreach ($student_groups as $student_group)
                         <option value="{{ $student_group->id }}">
-                            {{ $student_group->name }}
+                            {{ $student_group->display_name }}
                         </option>
                     @endforeach
                 @endif

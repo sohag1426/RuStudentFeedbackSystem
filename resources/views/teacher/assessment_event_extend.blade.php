@@ -66,7 +66,7 @@
                         <div class="form-group">
                             <label for="group_id">Student Group</label>
                             <select class="form-control" id="group_id" disabled>
-                                <option>{{ $assessment_event->group->name }}</option>
+                                <option>{{ $assessment_event->group->display_name }}</option>
                             </select>
                         </div>
                         <!--/group_id-->

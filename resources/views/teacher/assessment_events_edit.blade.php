@@ -73,10 +73,9 @@
                         <div class="form-group">
                             <label for="group_id">Student Group</label>
                             <select class="form-control" id="group_id" name="group_id" required>
-                                <option value="{{ $assessment_event->group_id }}">{{ $assessment_event->group->name }}
-                                </option>
+                                <option value="{{ $assessment_event->group_id }}">{{ $assessment_event->group->display_name }}</option>
                                 @foreach ($groups as $group)
-                                    <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                    <option value="{{ $group->id }}">{{ $group->display_name }}</option>
                                 @endforeach
                             </select>
                         </div>

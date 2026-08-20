@@ -39,4 +39,29 @@ class student_group extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id')->withDefault();
     }
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'year' => \App\Enums\Year::class,
+        'semester' => \App\Enums\Semester::class,
+    ];
+
+    /**
+     * Get the display name for the student group.
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        $yearVal = $this->year instanceof \App\Enums\Year ? $this->year->value : $this->year;
+        $semesterVal = $this->semester instanceof \App\Enums\Semester ? $this->semester->value : $this->semester;
+
+        if ($yearVal && $semesterVal) {
+            return $yearVal . ', ' . $semesterVal;
+        }
+
+        return (string) $this->name;
+    }
 }

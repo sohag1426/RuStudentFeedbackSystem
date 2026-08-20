@@ -73,7 +73,7 @@
                             <select class="form-control" id="group_id" name="group_id" required>
                                 <option value="">Please select...</option>
                                 @foreach ($groups as $group)
-                                    <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                    <option value="{{ $group->id }}">{{ $group->display_name }}</option>
                                 @endforeach
                             </select>
                         </div>
