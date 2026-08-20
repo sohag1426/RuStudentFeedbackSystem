@@ -41,4 +41,20 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Get the assessment events for the teacher.
+     */
+    public function assessment_events()
+    {
+        return $this->hasMany(assessment_event::class, 'teacher_id', 'id');
+    }
+
+    /**
+     * Get the department.
+     */
+    public function department()
+    {
+        return $this->belongsTo(department::class, 'department_id', 'id')->withDefault();
+    }
 }

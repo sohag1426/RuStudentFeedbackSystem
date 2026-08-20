@@ -63,14 +63,28 @@ Report By Teacher
                     </td>
                     <td>{{ $teacher->email }}</td>
                     <td>
+                        @if ($teacher->assessment_events_count > 0)
                         <a href="{{ route('admin-reports.teacher.download', $teacher) }}" class="btn btn-outline-success btn-sm">
                             <i class="fas fa-file-pdf"></i> Download PDF
                         </a>
+                        @else
+                        <span class="text-danger font-weight-bold">0 Feedback</span>
+                        @endif
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
+    </div>
+    <div class="card-footer">
+        <div class="row">
+            <div class="col-sm-2">
+                Total Entries: {{ $teachers->total() }}
+            </div>
+            <div class="col-sm-10">
+                {{ $teachers->links() }}
+            </div>
+        </div>
     </div>
 </div>
 @endsection

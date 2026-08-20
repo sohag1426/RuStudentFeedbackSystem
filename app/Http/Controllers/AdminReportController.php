@@ -19,13 +19,13 @@ class AdminReportController extends Controller
     public function teacherIndex(Request $request)
     {
         $departments = department::all();
-        $query = User::where('role', 'teacher');
+        $query = User::where('role', 'teacher')->withCount('assessment_events');
         
         if ($request->filled('department_id')) {
             $query->where('department_id', $request->department_id);
         }
         
-        $teachers = $query->get();
+        $teachers = $query->paginate(50)->withQueryString();
         return view('admin.reports.teacher', compact('teachers', 'departments'));
     }
 
