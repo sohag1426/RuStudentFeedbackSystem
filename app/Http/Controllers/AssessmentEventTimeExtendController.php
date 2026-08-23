@@ -36,6 +36,19 @@ class AssessmentEventTimeExtendController extends Controller
         $stop_time = Carbon::createFromFormat(config('datetimeformat.date_format'), $stop_date);
         $stop_time->setHour($request->stop_hour)->setMinute($request->stop_minute);
 
+        $start_time = Carbon::parse($assessment_event->start_time);
+        $now = Carbon::now('Asia/Dhaka');
+
+        if ($stop_time->lessThanOrEqualTo($start_time)) {
+            return redirect()->route('assessment_events.extend_time.create', ['assessment_event' => $assessment_event])
+                ->with('info', 'Stop time must be after the start time.');
+        }
+
+        if ($stop_time->lessThan($now)) {
+            return redirect()->route('assessment_events.extend_time.create', ['assessment_event' => $assessment_event])
+                ->with('info', 'Stop time must be in the future.');
+        }
+
         $assessment_event->stop_time = $stop_time;
         $assessment_event->save();
 

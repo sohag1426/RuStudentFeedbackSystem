@@ -50,7 +50,7 @@ class AssessmentEventStudentController extends Controller
     {
 
         $request->validate([
-            'excel_file' => 'mimes:xlsx',
+            'excel_file' => ['required', 'file', 'mimes:xlsx,xls'],
         ]);
 
         $file = $request->file('excel_file')->store('group_members');
@@ -70,12 +70,12 @@ class AssessmentEventStudentController extends Controller
                 continue;
             }
             assessment_event_student::updateOrCreate(
-                ['event_id' => $assessment_event->id, 'department_id' => $assessment_event->department_id, 'student_id' => trim($row['student_id'])],
-                ['name' => trim($row['name'])]
+                ['event_id' => $assessment_event->id, 'department_id' => $assessment_event->department_id, 'student_id' => trim((string) $row['student_id'])],
+                ['name' => trim((string) $row['name'])]
             );
         }
 
-        Storage::delete($path);
+        Storage::delete($file);
 
         return redirect()->route('assessment_events.assessment_event_students.index', ['assessment_event' => $assessment_event]);
     }

@@ -41,7 +41,7 @@ class StudentGroupMemberController extends Controller
     public function store(Request $request, student_group $student_group)
     {
         $request->validate([
-            'excel_file' => 'mimes:xlsx',
+            'excel_file' => ['required', 'file', 'mimes:xlsx,xls'],
         ]);
 
         $file = $request->file('excel_file')->store('group_members');
@@ -61,17 +61,17 @@ class StudentGroupMemberController extends Controller
                 continue;
             }
 
-            if (student_group_member::where('group_id', $student_group->id)->where('student_id', $row['student_id'])->exists()) {
-                continue;
-            }
-
             student_group_member::updateOrCreate(
-                ['department_id' => $request->user()->department_id, 'group_id' => $student_group->id, 'student_id' => trim($row['student_id'])],
-                ['name' => trim($row['name'])]
+                [
+                    'department_id' => $request->user()->department_id,
+                    'group_id' => $student_group->id,
+                    'student_id' => trim((string) $row['student_id']),
+                ],
+                ['name' => trim((string) $row['name'])]
             );
         }
 
-        Storage::delete($path);
+        Storage::delete($file);
 
         return redirect()->route('student_groups.index');
     }
