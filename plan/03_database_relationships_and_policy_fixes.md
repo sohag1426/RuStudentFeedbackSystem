@@ -103,9 +103,9 @@ Fix broken Eloquent relationships, repair incomplete mass-assignment fillable at
 ---
 
 ## Verification Criteria
-- [ ] `$assessment->student` no longer causes errors on non-existent column `member_id`.
-- [ ] `$assessment_status->student` correctly resolves student record.
-- [ ] `User::create([...])` correctly persists all user attributes.
-- [ ] `ScoreService::generateScore` runs atomically inside a database transaction.
-- [ ] `DepartmentChair` can generate and download reports for courses in their department.
-- [ ] Observer deletion logs record correct model class.
+- [x] `$assessment->student` no longer causes errors on non-existent column `member_id`.
+- [x] `$assessment_status->student` correctly resolves student record.
+- [x] `User::create([...])` correctly persists all user attributes.
+- [x] `ScoreService::generateScore` runs atomically inside a database transaction.
+- [x] `DepartmentChair` can generate, download, and view scores for courses in their department.
+- [x] Observer deletion logs record correct model class.

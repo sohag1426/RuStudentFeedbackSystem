@@ -33,16 +33,7 @@ class assessment extends Model
     }
 
     /**
-     * Get the student
-     */
-    public function student()
-    {
-        return $this->belongsTo(student_group_member::class, 'member_id', 'id')->withDefault();
-    }
-
-
-    /**
-     * Get the student
+     * Get the question
      */
     public function question()
     {

@@ -36,7 +36,7 @@ class AssessmentEventStudentObserver
                 $log->department_id = auth()->user()->department_id;
                 $log->topic = 'student deleted from feedback event';
                 $log->log = 'event_id : ' . $assessment_event_student->event_id . ' student_id: ' . $assessment_event_student->student_id;
-                $log->model_type = 'App\Models\student_group_member';
+                $log->model_type = 'App\Models\assessment_event_student';
                 $log->model_id = $assessment_event_student->id;
                 $log->save();
             } catch (\Throwable $th) {

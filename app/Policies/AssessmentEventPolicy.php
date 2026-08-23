@@ -18,22 +18,14 @@ class AssessmentEventPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function generateReport(User $user, assessment_event $assessmentEvent)
+    public function generateReport(User $user, assessment_event $assessmentEvent): bool
     {
-        if ($user->role == 'DepartmentChair' && $user->department_id == $assessmentEvent->department_id) {
-            return true;
-        }
-
         if ($user->department_id !== $assessmentEvent->department_id) {
             return false;
         }
 
-        if ($user->id !== $assessmentEvent->teacher_id) {
-            return false;
-        }
-
-        if (assessment::where('event_id', $assessmentEvent->id)->count() > 1) {
-            return true;
+        if ($user->role === 'DepartmentChair' || $user->id === $assessmentEvent->teacher_id || $user->id === $assessmentEvent->user_id) {
+            return assessment::where('event_id', $assessmentEvent->id)->exists();
         }
 
         return false;
@@ -44,18 +36,14 @@ class AssessmentEventPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function downloadReport(User $user, assessment_event $assessmentEvent)
+    public function downloadReport(User $user, assessment_event $assessmentEvent): bool
     {
         if ($user->department_id !== $assessmentEvent->department_id) {
             return false;
         }
 
-        if ($user->id !== $assessmentEvent->teacher_id) {
-            return false;
-        }
-
-        if (detailed_score::where('event_id', $assessmentEvent->id)->count()) {
-            return true;
+        if ($user->role === 'DepartmentChair' || $user->id === $assessmentEvent->teacher_id || $user->id === $assessmentEvent->user_id) {
+            return detailed_score::where('event_id', $assessmentEvent->id)->exists();
         }
 
         return false;
@@ -86,14 +74,14 @@ class AssessmentEventPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function viewScore(User $user, assessment_event $assessmentEvent)
+    public function viewScore(User $user, assessment_event $assessmentEvent): bool
     {
-        if ($user->id == $assessmentEvent->teacher_id) {
-            return true;
+        if ($user->department_id !== $assessmentEvent->department_id) {
+            return false;
         }
 
-        if ($user->role == 'DepartmentChair' && $user->department_id == $assessmentEvent->department_id) {
-            return false;
+        if ($user->role === 'DepartmentChair' || $user->id === $assessmentEvent->teacher_id || $user->id === $assessmentEvent->user_id) {
+            return true;
         }
 
         return false;

@@ -37,6 +37,6 @@ class assessment_status extends Model
      */
     public function student()
     {
-        return $this->belongsTo(student_group_member::class, 'member_id', 'id')->withDefault();
+        return $this->belongsTo(assessment_event_student::class, 'student_id', 'student_id')->withDefault();
     }
 }
