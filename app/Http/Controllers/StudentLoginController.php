@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\assessment_event_student;
-use App\Models\department;
+use App\Models\AssessmentEventStudent;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -19,7 +19,7 @@ class StudentLoginController extends Controller
      */
     public function create()
     {
-        $departments = department::all();
+        $departments = Department::all();
         return view('student.student-login', [
             'departments' => $departments,
         ]);
@@ -39,14 +39,14 @@ class StudentLoginController extends Controller
         ]);
 
         // student count
-        $student_count = assessment_event_student::where('student_id', $request->student_id)->count();
+        $student_count = AssessmentEventStudent::where('student_id', $request->student_id)->count();
         if ($student_count == 0) {
             return redirect()->route('student-login-form')
                 ->withInput($request->only('student_id'))
                 ->with('error', 'There is no course available for you to provide feedback.');
         }
 
-        $assessment_event_student = assessment_event_student::where('student_id', $request->student_id)->first();
+        $assessment_event_student = AssessmentEventStudent::where('student_id', $request->student_id)->first();
 
         // check password
         $verify = $this->verify($request->student_id, $request->password);

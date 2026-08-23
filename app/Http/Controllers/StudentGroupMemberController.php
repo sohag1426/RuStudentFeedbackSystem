@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\student_group;
-use App\Models\student_group_member;
+use App\Models\StudentGroup;
+use App\Models\StudentGroupMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Spatie\SimpleExcel\SimpleExcelReader;
@@ -15,7 +15,7 @@ class StudentGroupMemberController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(student_group $student_group)
+    public function index(StudentGroup $student_group)
     {
         return view('teacher.group-members', [
             'student_group' => $student_group,
@@ -28,7 +28,7 @@ class StudentGroupMemberController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(student_group $student_group)
+    public function create(StudentGroup $student_group)
     {
         return view('teacher.group-members-create', ['student_group' => $student_group]);
     }
@@ -38,7 +38,7 @@ class StudentGroupMemberController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, student_group $student_group)
+    public function store(Request $request, StudentGroup $student_group)
     {
         $request->validate([
             'excel_file' => ['required', 'file', 'mimes:xlsx,xls'],
@@ -61,7 +61,7 @@ class StudentGroupMemberController extends Controller
                 continue;
             }
 
-            student_group_member::updateOrCreate(
+            StudentGroupMember::updateOrCreate(
                 [
                     'department_id' => $request->user()->department_id,
                     'group_id' => $student_group->id,
@@ -79,10 +79,9 @@ class StudentGroupMemberController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\student_group  $student_group
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, student_group_member $student_group_member)
+    public function destroy(Request $request, StudentGroupMember $student_group_member)
     {
         if ($request->user()->department_id == $student_group_member->department_id) {
             $student_group_member->delete();

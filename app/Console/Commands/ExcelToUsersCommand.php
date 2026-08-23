@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\department;
+use App\Models\Department;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
@@ -68,8 +68,8 @@ class ExcelToUsersCommand extends Command
         $departments =  $users->groupBy('department')->keys()->sort()->unique();
         foreach ($departments as $dept) {
             // Only New Department
-            if (department::where('en_name', $dept)->count() == 0) {
-                $department = new department();
+            if (Department::where('en_name', $dept)->count() == 0) {
+                $department = new Department();
                 $department->en_name = $dept;
                 $department->save();
                 User::where('department', $dept)

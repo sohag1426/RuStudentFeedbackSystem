@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\assessment_event;
+use App\Models\AssessmentEvent;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -11,7 +11,7 @@ class AssessmentEventTimeExtendController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(assessment_event $assessment_event)
+    public function create(AssessmentEvent $assessment_event)
     {
         $this->authorize('update', [$assessment_event]);
         return view('teacher.assessment_event_extend', [
@@ -22,7 +22,7 @@ class AssessmentEventTimeExtendController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, assessment_event $assessment_event)
+    public function store(Request $request, AssessmentEvent $assessment_event)
     {
         $this->authorize('update', [$assessment_event]);
 

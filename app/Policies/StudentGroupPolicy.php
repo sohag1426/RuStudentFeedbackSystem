@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
-use App\Models\assessment_event;
-use App\Models\student_group;
-use App\Models\student_group_member;
+use App\Models\AssessmentEvent;
+use App\Models\StudentGroup;
+use App\Models\StudentGroupMember;
 use App\Models\User;
 
 class StudentGroupPolicy
@@ -20,7 +20,7 @@ class StudentGroupPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, student_group $studentGroup): bool
+    public function view(User $user, StudentGroup $studentGroup): bool
     {
         return $user->department_id == $studentGroup->department_id;
     }
@@ -36,7 +36,7 @@ class StudentGroupPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, student_group $studentGroup): bool
+    public function update(User $user, StudentGroup $studentGroup): bool
     {
         return $user->department_id == $studentGroup->department_id;
     }
@@ -44,23 +44,23 @@ class StudentGroupPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, student_group $studentGroup): bool
+    public function delete(User $user, StudentGroup $studentGroup): bool
     {
-        if (student_group_member::where('group_id', $studentGroup->id)->exists()) {
+        if (StudentGroupMember::where('group_id', $studentGroup->id)->exists()) {
             return false;
         }
 
-        if (assessment_event::where('department_id', $user->department_id)->where('group_id', $studentGroup->id)->exists()) {
+        if (AssessmentEvent::where('department_id', $user->department_id)->where('group_id', $studentGroup->id)->exists()) {
             return false;
         }
 
-        return $user->department_id == $studentGroup->department_id && $user->role == 'DepartmentManager';
+        return $user->department_id == $studentGroup->department_id && ($user->role == 'DepartmentManager' || $user->role == 'DepartmentChair');
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, student_group $studentGroup): bool
+    public function restore(User $user, StudentGroup $studentGroup): bool
     {
         return false;
     }
@@ -68,7 +68,7 @@ class StudentGroupPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, student_group $studentGroup): bool
+    public function forceDelete(User $user, StudentGroup $studentGroup): bool
     {
         return false;
     }

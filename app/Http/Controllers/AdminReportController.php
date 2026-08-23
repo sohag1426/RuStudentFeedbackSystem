@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\department;
+use App\Models\AssessmentEvent;
+use App\Models\Department;
 use App\Models\User;
-use App\Models\assessment_event;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 
 class AdminReportController extends Controller
 {
     public function departmentIndex()
     {
-        $departments = department::all();
+        $departments = Department::all();
         return view('admin.reports.department', compact('departments'));
     }
 
     public function teacherIndex(Request $request)
     {
-        $departments = department::all();
+        $departments = Department::all();
         $query = User::where('role', 'teacher')->withCount('assessment_events');
         
         if ($request->filled('department_id')) {
@@ -29,9 +29,9 @@ class AdminReportController extends Controller
         return view('admin.reports.teacher', compact('teachers', 'departments'));
     }
 
-    public function departmentDownload(department $department)
+    public function departmentDownload(Department $department)
     {
-        $events = assessment_event::where('department_id', $department->id)
+        $events = AssessmentEvent::where('department_id', $department->id)
             ->with(['teacher', 'course'])
             ->orderBy('teacher_id')
             ->get();
@@ -52,7 +52,7 @@ class AdminReportController extends Controller
 
     public function teacherDownload(User $teacher)
     {
-        $events = assessment_event::where('teacher_id', $teacher->id)
+        $events = AssessmentEvent::where('teacher_id', $teacher->id)
             ->with(['department', 'course'])
             ->get();
             

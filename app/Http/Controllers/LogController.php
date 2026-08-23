@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\log;
+use App\Models\Log;
 use Illuminate\Http\Request;
 
 class LogController extends Controller
@@ -12,7 +12,7 @@ class LogController extends Controller
      */
     public function index(Request $request)
     {
-        $logs = log::where('department_id', $request->user()->department_id)->get();
+        $logs = Log::where('department_id', $request->user()->department_id)->get();
 
         return view('teacher.logs', [
             'logs' => $logs,

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\department;
+use App\Models\Department;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -37,11 +37,11 @@ class AddUserCommand extends Command
         $internetId = $this->ask('Internet ID ?');
         $departmentName = $this->ask('Department Name ?');
 
-        $departments = department::where('en_name', 'like', "%$departmentName%")->get(['id', 'en_name']);
+        $departments = Department::where('en_name', 'like', "%$departmentName%")->get(['id', 'en_name']);
         $this->table(['id', 'en_name'], $departments->toArray());
 
         $departmentId = $this->ask('Department ID ?');
-        $department = department::findOrFail($departmentId);
+        $department = Department::findOrFail($departmentId);
 
         $role = $this->ask('Role ? teacher|DepartmentChair|DepartmentManager');
         $name = $this->ask('Name ?');

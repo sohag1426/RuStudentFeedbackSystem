@@ -2,25 +2,25 @@
 
 namespace App\Observers;
 
-use App\Models\assessment_event;
-use App\Models\log;
+use App\Models\AssessmentEvent;
+use App\Models\Log;
 use Illuminate\Support\Facades\Log as FacadesLog;
 
 class AssessmentEventObserver
 {
     /**
-     * Handle the assessment_event "created" event.
+     * Handle the AssessmentEvent "created" event.
      */
-    public function created(assessment_event $assessment_event): void
+    public function created(AssessmentEvent $assessment_event): void
     {
         if (auth()->user()) {
             try {
-                $log = new log();
+                $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->department_id = auth()->user()->department_id;
                 $log->topic = 'feedback event created';
                 $log->log = 'id : ' . $assessment_event->id;
-                $log->model_type = 'App\Models\assessment_event';
+                $log->model_type = AssessmentEvent::class;
                 $log->model_id = $assessment_event->id;
                 $log->save();
             } catch (\Throwable $th) {
@@ -30,9 +30,9 @@ class AssessmentEventObserver
     }
 
     /**
-     * Handle the assessment_event "updated" event.
+     * Handle the AssessmentEvent "updated" event.
      */
-    public function updated(assessment_event $assessment_event): void
+    public function updated(AssessmentEvent $assessment_event): void
     {
         // log
         $logMessages = [];
@@ -45,7 +45,7 @@ class AssessmentEventObserver
         }
 
         if ($assessment_event->wasChanged('group_id')) {
-            $logMessages[] = 'studen group id was changed from ' . $assessment_event->getOriginal('group_id') . ' to ' . $assessment_event->group_id;
+            $logMessages[] = 'student group id was changed from ' . $assessment_event->getOriginal('group_id') . ' to ' . $assessment_event->group_id;
         }
 
         if ($assessment_event->wasChanged('stop_time')) {
@@ -54,12 +54,12 @@ class AssessmentEventObserver
 
         foreach ($logMessages as $logMessage) {
             try {
-                $log = new log();
+                $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->department_id = auth()->user()->department_id;
                 $log->topic = 'feedback event updated';
                 $log->log = $logMessage;
-                $log->model_type = 'App\Models\assessment_event';
+                $log->model_type = AssessmentEvent::class;
                 $log->model_id = $assessment_event->id;
                 $log->save();
             } catch (\Throwable $th) {
@@ -69,18 +69,18 @@ class AssessmentEventObserver
     }
 
     /**
-     * Handle the assessment_event "deleted" event.
+     * Handle the AssessmentEvent "deleted" event.
      */
-    public function deleted(assessment_event $assessment_event): void
+    public function deleted(AssessmentEvent $assessment_event): void
     {
         if (auth()->user()) {
             try {
-                $log = new log();
+                $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->department_id = auth()->user()->department_id;
                 $log->topic = 'feedback event deleted';
                 $log->log = 'id : ' . $assessment_event->id;
-                $log->model_type = 'App\Models\assessment_event';
+                $log->model_type = AssessmentEvent::class;
                 $log->model_id = $assessment_event->id;
                 $log->save();
             } catch (\Throwable $th) {

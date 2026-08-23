@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\log;
+use App\Models\Log;
 use Illuminate\Http\Request;
 
 class AdminLoginLogsController extends Controller
@@ -13,7 +13,7 @@ class AdminLoginLogsController extends Controller
     public function index(Request $request)
     {
         $admin = auth('admin')->user();
-        $logs = log::where('model_id', $admin->id)
+        $logs = Log::where('model_id', $admin->id)
             ->where('model_type', 'App\Models\Admin')
             ->where('topic', 'Login')
             ->get();

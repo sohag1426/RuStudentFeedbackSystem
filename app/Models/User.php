@@ -51,9 +51,17 @@ class User extends Authenticatable
     /**
      * Get the assessment events for the teacher.
      */
+    public function assessmentEvents()
+    {
+        return $this->hasMany(AssessmentEvent::class, 'teacher_id', 'id');
+    }
+
+    /**
+     * Legacy snake_case relation alias.
+     */
     public function assessment_events()
     {
-        return $this->hasMany(assessment_event::class, 'teacher_id', 'id');
+        return $this->assessmentEvents();
     }
 
     /**
@@ -61,6 +69,6 @@ class User extends Authenticatable
      */
     public function department()
     {
-        return $this->belongsTo(department::class, 'department_id', 'id')->withDefault();
+        return $this->belongsTo(Department::class, 'department_id', 'id')->withDefault();
     }
 }

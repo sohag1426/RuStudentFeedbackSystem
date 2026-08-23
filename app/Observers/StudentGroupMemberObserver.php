@@ -2,25 +2,25 @@
 
 namespace App\Observers;
 
-use App\Models\log;
-use App\Models\student_group_member;
+use App\Models\Log;
+use App\Models\StudentGroupMember;
 use Illuminate\Support\Facades\Log as FacadesLog;
 
 class StudentGroupMemberObserver
 {
     /**
-     * Handle the student_group_member "created" event.
+     * Handle the StudentGroupMember "created" event.
      */
-    public function created(student_group_member $student_group_member): void
+    public function created(StudentGroupMember $student_group_member): void
     {
         if (auth()->user()) {
             try {
-                $log = new log();
+                $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->department_id = auth()->user()->department_id;
                 $log->topic = 'student group member created';
                 $log->log = 'group_id : ' . $student_group_member->group_id . ' student_id: ' . $student_group_member->student_id;
-                $log->model_type = 'App\Models\student_group_member';
+                $log->model_type = StudentGroupMember::class;
                 $log->model_id = $student_group_member->id;
                 $log->save();
             } catch (\Throwable $th) {
@@ -30,26 +30,26 @@ class StudentGroupMemberObserver
     }
 
     /**
-     * Handle the student_group_member "updated" event.
+     * Handle the StudentGroupMember "updated" event.
      */
-    public function updated(student_group_member $student_group_member): void
+    public function updated(StudentGroupMember $student_group_member): void
     {
         //
     }
 
     /**
-     * Handle the student_group_member "deleted" event.
+     * Handle the StudentGroupMember "deleted" event.
      */
-    public function deleted(student_group_member $student_group_member): void
+    public function deleted(StudentGroupMember $student_group_member): void
     {
         if (auth()->user()) {
             try {
-                $log = new log();
+                $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->department_id = auth()->user()->department_id;
                 $log->topic = 'student group member deleted';
                 $log->log = 'group_id : ' . $student_group_member->group_id . ' student_id: ' . $student_group_member->student_id;
-                $log->model_type = 'App\Models\student_group_member';
+                $log->model_type = StudentGroupMember::class;
                 $log->model_id = $student_group_member->id;
                 $log->save();
             } catch (\Throwable $th) {

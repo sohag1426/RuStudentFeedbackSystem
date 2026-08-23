@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\assessment_event_student;
+use App\Models\AssessmentEventStudent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
-class StudenLogoutController extends Controller
+class StudentLogoutController extends Controller
 {
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage (logout action).
      */
-    public function store(Request $request, assessment_event_student $assessment_event_student)
+    public function store(Request $request, AssessmentEventStudent $assessment_event_student)
     {
         Cache::forget('student_token_' . $assessment_event_student->id);
         $request->session()->forget('student_auth_token_' . $assessment_event_student->id);

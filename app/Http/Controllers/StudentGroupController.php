@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\Semester;
 use App\Enums\Year;
-use App\Models\log;
-use App\Models\student_group;
+use App\Models\Log;
+use App\Models\StudentGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rules\Enum;
@@ -20,7 +20,7 @@ class StudentGroupController extends Controller
      */
     public function index(Request $request)
     {
-        $student_groups = student_group::with('members')->where('department_id', $request->user()->department_id)->get();
+        $student_groups = StudentGroup::with('members')->where('department_id', $request->user()->department_id)->get();
 
         return view('teacher.student_groups', [
             'student_groups' => $student_groups,
@@ -53,7 +53,7 @@ class StudentGroupController extends Controller
             'semester' => ['required', new Enum(Semester::class)],
         ]);
 
-        if (student_group::where('department_id', $request->user()->department_id)
+        if (StudentGroup::where('department_id', $request->user()->department_id)
             ->where('name', $request->name)
             ->where('year', $request->year)
             ->where('semester', $request->semester)
@@ -61,7 +61,7 @@ class StudentGroupController extends Controller
             return redirect()->route('student_groups.index')->with('info', 'Duplicate Student Group');
         }
 
-        $student_group = new student_group();
+        $student_group = new StudentGroup();
         $student_group->user_id = $request->user()->id;
         $student_group->department_id = $request->user()->department_id;
         $student_group->name = $request->name;
@@ -77,7 +77,7 @@ class StudentGroupController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function edit(student_group $student_group)
+    public function edit(StudentGroup $student_group)
     {
         return view('teacher.student_group_edit', [
             'student_group' => $student_group,
@@ -91,7 +91,7 @@ class StudentGroupController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, student_group $student_group)
+    public function update(Request $request, StudentGroup $student_group)
     {
         $request->validate([
             'name' => 'required|string',
@@ -99,7 +99,7 @@ class StudentGroupController extends Controller
             'semester' => ['required', new Enum(Semester::class)],
         ]);
 
-        if (student_group::where('department_id', $request->user()->department_id)
+        if (StudentGroup::where('department_id', $request->user()->department_id)
             ->where('name', $request->name)
             ->where('year', $request->year)
             ->where('semester', $request->semester)
@@ -118,12 +118,12 @@ class StudentGroupController extends Controller
         // log
         if ($student_group->wasChanged(['name', 'year', 'semester'])) {
             $log_message = 'student group was changed from ' . $oldName . ' to ' . $student_group->name;
-            $log = new log();
+            $log = new Log();
             $log->user_id = $request->user()->id;
             $log->department_id = $request->user()->department_id;
             $log->topic = 'student group updated';
             $log->log = $log_message;
-            $log->model_type = 'App\Models\student_group';
+            $log->model_type = StudentGroup::class;
             $log->model_id = $student_group->id;
             $log->save();
         }
@@ -136,7 +136,7 @@ class StudentGroupController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, student_group $student_group)
+    public function destroy(Request $request, StudentGroup $student_group)
     {
         Gate::authorize('delete', $student_group);
 
@@ -144,12 +144,14 @@ class StudentGroupController extends Controller
         $student_group->delete();
 
         // Log the deletion
-        $log = new log();
+        $log = new Log();
         $log->user_id = $request->user()->id;
         $log->department_id = $request->user()->department_id;
         $log->topic = 'student group deleted';
-        $log->log = 'student group deleted: ' . ($student_group->year && $student_group->semester ? $student_group->year . ', ' . $student_group->semester : $student_group->name);
-        $log->model_type = 'App\Models\student_group';
+        $yearVal = $student_group->year instanceof Year ? $student_group->year->value : $student_group->year;
+        $semVal = $student_group->semester instanceof Semester ? $student_group->semester->value : $student_group->semester;
+        $log->log = 'student group deleted: ' . ($yearVal && $semVal ? $yearVal . ', ' . $semVal : $student_group->name);
+        $log->model_type = StudentGroup::class;
         $log->model_id = $student_group->id;
         $log->save();
 
@@ -161,9 +163,11 @@ class StudentGroupController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function export(student_group $student_group)
+    public function export(StudentGroup $student_group)
     {
-        $groupTitle = $student_group->year && $student_group->semester ? $student_group->year . '-' . $student_group->semester : $student_group->name;
+        $yearVal = $student_group->year instanceof Year ? $student_group->year->value : $student_group->year;
+        $semVal = $student_group->semester instanceof Semester ? $student_group->semester->value : $student_group->semester;
+        $groupTitle = $yearVal && $semVal ? $yearVal . '-' . $semVal : $student_group->name;
         $fileName = 'students-' . $groupTitle . '.xlsx';
         $writer = SimpleExcelWriter::streamDownload($fileName);
 

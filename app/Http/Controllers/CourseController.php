@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\course;
+use App\Models\Course;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
@@ -14,7 +14,7 @@ class CourseController extends Controller
      */
     public function index(Request $request)
     {
-        $courses = course::where('department_id', $request->user()->department_id)->get();
+        $courses = Course::where('department_id', $request->user()->department_id)->get();
 
         return view('teacher.courses', [
             'courses' => $courses,
@@ -45,15 +45,15 @@ class CourseController extends Controller
             'name' => 'required|string',
         ]);
 
-        if (course::where('department_id', $request->user()->department_id)->where('code', $request->code)->count()) {
+        if (Course::where('department_id', $request->user()->department_id)->where('code', $request->code)->count()) {
             return redirect()->route('courses.index')->with('info', 'Duplicate Course Code');
         }
 
-        if (course::where('department_id', $request->user()->department_id)->where('name', $request->name)->count()) {
+        if (Course::where('department_id', $request->user()->department_id)->where('name', $request->name)->count()) {
             return redirect()->route('courses.index')->with('info', 'Duplicate Course Name');
         }
 
-        $course = new course();
+        $course = new Course();
         $course->user_id = $request->user()->id;
         $course->department_id = $request->user()->department_id;
         $course->code = $request->code;
@@ -66,10 +66,10 @@ class CourseController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\course  $course
+     * @param  \App\Models\Course  $course
      * @return \Illuminate\Http\Response
      */
-    public function edit(course $course)
+    public function edit(Course $course)
     {
         return view('teacher.courses-edit', [
             'course' => $course,
@@ -80,10 +80,10 @@ class CourseController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\course  $course
+     * @param  \App\Models\Course  $course
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, course $course)
+    public function update(Request $request, Course $course)
     {
         $request->validate([
             'code' => 'required|string',
@@ -91,13 +91,13 @@ class CourseController extends Controller
         ]);
 
         if ($request->code != $course->code) {
-            if (course::where('department_id', $request->user()->department_id)->where('code', $request->code)->count()) {
+            if (Course::where('department_id', $request->user()->department_id)->where('code', $request->code)->count()) {
                 return redirect()->route('courses.index')->with('info', 'Duplicate Course Code');
             }
         }
 
         if ($request->name != $course->name) {
-            if (course::where('department_id', $request->user()->department_id)->where('name', $request->name)->count()) {
+            if (Course::where('department_id', $request->user()->department_id)->where('name', $request->name)->count()) {
                 return redirect()->route('courses.index')->with('info', 'Duplicate Course Name');
             }
         }

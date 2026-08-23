@@ -2,11 +2,11 @@
 
 namespace App\Providers;
 
-use App\Models\assessment_event;
-use App\Models\assessment_event_student;
-use App\Models\course;
-use App\Models\student_group;
-use App\Models\student_group_member;
+use App\Models\AssessmentEvent;
+use App\Models\AssessmentEventStudent;
+use App\Models\Course;
+use App\Models\StudentGroup;
+use App\Models\StudentGroupMember;
 use App\Models\User;
 use App\Observers\AssessmentEventObserver;
 use App\Observers\AssessmentEventStudentObserver;
@@ -40,11 +40,11 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         User::observe(UserObserver::class);
-        course::observe(CourseObserver::class);
-        student_group::observe(StudentGroupObserver::class);
-        student_group_member::observe(StudentGroupMemberObserver::class);
-        assessment_event_student::observe(AssessmentEventStudentObserver::class);
-        assessment_event::observe(AssessmentEventObserver::class);
+        Course::observe(CourseObserver::class);
+        StudentGroup::observe(StudentGroupObserver::class);
+        StudentGroupMember::observe(StudentGroupMemberObserver::class);
+        AssessmentEventStudent::observe(AssessmentEventStudentObserver::class);
+        AssessmentEvent::observe(AssessmentEventObserver::class);
     }
 
     /**

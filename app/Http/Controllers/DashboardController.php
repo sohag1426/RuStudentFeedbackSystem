@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\log;
+use App\Models\Log;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -18,7 +18,7 @@ class DashboardController extends Controller
             return redirect()->route('users.profile.create', ['user' => $request->user()]);
         }
 
-        $logs = log::where('department_id', $request->user()->department_id)
+        $logs = Log::where('department_id', $request->user()->department_id)
             ->where('topic', 'Login')
             ->where('model_id', $request->user()->id)
             ->get();
@@ -27,7 +27,7 @@ class DashboardController extends Controller
             'teacher', 'DepartmentChair', 'DepartmentManager' => view('teacher.dashboard', [
                 'logs' => $logs,
             ]),
-            default => 'Not Found',
+            default => view('teacher.dashboard', ['logs' => $logs]),
         };
     }
 }

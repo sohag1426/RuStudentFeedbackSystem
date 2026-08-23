@@ -2,25 +2,25 @@
 
 namespace App\Observers;
 
-use App\Models\log;
-use App\Models\student_group;
+use App\Models\Log;
+use App\Models\StudentGroup;
 use Illuminate\Support\Facades\Log as FacadesLog;
 
 class StudentGroupObserver
 {
     /**
-     * Handle the student_group "created" event.
+     * Handle the StudentGroup "created" event.
      */
-    public function created(student_group $student_group): void
+    public function created(StudentGroup $student_group): void
     {
         if (auth()->user()) {
             try {
-                $log = new log();
+                $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->department_id = auth()->user()->department_id;
                 $log->topic = 'student group created';
                 $log->log = 'name: ' . $student_group->name;
-                $log->model_type = 'App\Models\student_group';
+                $log->model_type = StudentGroup::class;
                 $log->model_id = $student_group->id;
                 $log->save();
             } catch (\Throwable $th) {
@@ -30,19 +30,19 @@ class StudentGroupObserver
     }
 
     /**
-     * Handle the student_group "updated" event.
+     * Handle the StudentGroup "updated" event.
      */
-    public function updated(student_group $student_group): void
+    public function updated(StudentGroup $student_group): void
     {
         if (auth()->user()) {
             if ($student_group->wasChanged('name')) {
                 try {
-                    $log = new log();
+                    $log = new Log();
                     $log->user_id = auth()->user()->id;
                     $log->department_id = auth()->user()->department_id;
                     $log->topic = 'student group name updated';
                     $log->log = 'Original: ' . $student_group->getOriginal('name') . ' New: ' . $student_group->name;
-                    $log->model_type = 'App\Models\student_group';
+                    $log->model_type = StudentGroup::class;
                     $log->model_id = $student_group->id;
                     $log->save();
                 } catch (\Throwable $th) {

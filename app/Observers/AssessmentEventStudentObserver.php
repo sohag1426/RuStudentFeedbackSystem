@@ -2,41 +2,41 @@
 
 namespace App\Observers;
 
-use App\Models\assessment_event_student;
-use App\Models\log;
+use App\Models\AssessmentEventStudent;
+use App\Models\Log;
 use Illuminate\Support\Facades\Log as FacadesLog;
 
 class AssessmentEventStudentObserver
 {
     /**
-     * Handle the assessment_event_student "created" event.
+     * Handle the AssessmentEventStudent "created" event.
      */
-    public function created(assessment_event_student $assessment_event_student): void
+    public function created(AssessmentEventStudent $assessment_event_student): void
     {
         //
     }
 
     /**
-     * Handle the assessment_event_student "updated" event.
+     * Handle the AssessmentEventStudent "updated" event.
      */
-    public function updated(assessment_event_student $assessment_event_student): void
+    public function updated(AssessmentEventStudent $assessment_event_student): void
     {
         //
     }
 
     /**
-     * Handle the assessment_event_student "deleted" event.
+     * Handle the AssessmentEventStudent "deleted" event.
      */
-    public function deleted(assessment_event_student $assessment_event_student): void
+    public function deleted(AssessmentEventStudent $assessment_event_student): void
     {
         if (auth()->user()) {
             try {
-                $log = new log();
+                $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->department_id = auth()->user()->department_id;
                 $log->topic = 'student deleted from feedback event';
                 $log->log = 'event_id : ' . $assessment_event_student->event_id . ' student_id: ' . $assessment_event_student->student_id;
-                $log->model_type = 'App\Models\assessment_event_student';
+                $log->model_type = AssessmentEventStudent::class;
                 $log->model_id = $assessment_event_student->id;
                 $log->save();
             } catch (\Throwable $th) {

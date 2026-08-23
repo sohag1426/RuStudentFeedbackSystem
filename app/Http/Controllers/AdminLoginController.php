@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\log;
+use App\Models\Log as LogModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log as FacadesLog;
@@ -35,7 +35,7 @@ class AdminLoginController extends Controller
             $request->session()->regenerate();
 
             try {
-                $log = new log();
+                $log = new LogModel();
                 $log->user_id = auth('admin')->user()->id;
                 $log->department_id = 0;
                 $log->topic = 'Login';

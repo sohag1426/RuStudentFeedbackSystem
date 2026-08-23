@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\assessment;
-use App\Models\assessment_event;
-use App\Models\assessment_status;
-use App\Models\detailed_score;
+use App\Models\Assessment;
+use App\Models\AssessmentEvent;
+use App\Models\AssessmentStatus;
+use App\Models\DetailedScore;
 use Illuminate\Support\Facades\DB;
 
 class ScoreService
@@ -13,9 +13,9 @@ class ScoreService
     /**
      * Generate score for a given assessment event and update group metrics for all related events.
      */
-    public static function generateScore(assessment_event $assessment_event)
+    public static function generateScore(AssessmentEvent $assessment_event)
     {
-        $assessments = assessment::where('department_id', $assessment_event->department_id)
+        $assessments = Assessment::where('department_id', $assessment_event->department_id)
             ->where('event_id', $assessment_event->id)
             ->get();
 
@@ -28,21 +28,21 @@ class ScoreService
             $total_score = $assessments->sum('score');
             $average_score = $total_score / $assessments_count;
 
-            $distinct_students = assessment_status::where('event_id', $assessment_event->id)->count();
+            $distinct_students = AssessmentStatus::where('event_id', $assessment_event->id)->count();
 
             $assessment_event->score = round($average_score, 2);
             $assessment_event->assessment_count = $distinct_students > 0 ? $distinct_students : max(1, $assessments->groupBy('student_id')->count());
             $assessment_event->save();
 
             // detailed score
-            detailed_score::where('event_id', $assessment_event->id)->delete();
+            DetailedScore::where('event_id', $assessment_event->id)->delete();
             $assessments_by_group = $assessments->groupBy('question_id');
             foreach ($assessments_by_group as $question_id => $assessments_group) {
                 $assessments_group_count = $assessments_group->count();
                 $assessments_group_total_score = $assessments_group->sum('score');
                 $group_average = $assessments_group_total_score / $assessments_group_count;
 
-                $detailed_score = new detailed_score();
+                $detailed_score = new DetailedScore();
                 $detailed_score->department_id = $assessment_event->department_id;
                 $detailed_score->event_id = $assessment_event->id;
                 $detailed_score->question_id = $question_id;
@@ -52,7 +52,7 @@ class ScoreService
             }
 
             // Update group_average, min, max for ALL events in the same group that have been generated
-            $group_events = assessment_event::where('group_id', $assessment_event->group_id)
+            $group_events = AssessmentEvent::where('group_id', $assessment_event->group_id)
                 ->where('score', '!=', 'undefined')
                 ->get();
 

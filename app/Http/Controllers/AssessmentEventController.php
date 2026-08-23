@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\assessment_event;
-use App\Models\assessment_event_student;
-use App\Models\assessment_status;
-use App\Models\course;
-use App\Models\student_group;
-use App\Models\student_group_member;
+use App\Models\AssessmentEvent;
+use App\Models\AssessmentEventStudent;
+use App\Models\AssessmentStatus;
+use App\Models\Course;
+use App\Models\StudentGroup;
+use App\Models\StudentGroupMember;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -42,7 +42,7 @@ class AssessmentEventController extends Controller
             $filter['course_id'] = $request->course_id;
         }
 
-        $assessment_events = assessment_event::with(['teacher', 'course', 'group'])
+        $assessment_events = AssessmentEvent::with(['teacher', 'course', 'group'])
             ->where($filter)
             ->get();
 
@@ -52,7 +52,7 @@ class AssessmentEventController extends Controller
                     ->orWhere('role', 'teacher');
             })->get();
 
-        $courses = course::where('department_id', $request->user()->department_id)->get();
+        $courses = Course::where('department_id', $request->user()->department_id)->get();
 
         return view('teacher.assessment_events', [
             'assessment_events' => $assessment_events,
@@ -74,8 +74,8 @@ class AssessmentEventController extends Controller
                     ->orWhere('role', 'teacher');
             })->get();
 
-        $courses = course::where('department_id', $request->user()->department_id)->get();
-        $groups = student_group::where('department_id', $request->user()->department_id)->get();
+        $courses = Course::where('department_id', $request->user()->department_id)->get();
+        $groups = StudentGroup::where('department_id', $request->user()->department_id)->get();
 
         return view('teacher.assessment_events_create', [
             'teachers' => $teachers,
@@ -120,7 +120,7 @@ class AssessmentEventController extends Controller
             return redirect()->route('assessment_events.create')->with('info', 'It is not possible to stop before the start time.');
         }
 
-        $assessment_event = new assessment_event;
+        $assessment_event = new AssessmentEvent;
         $assessment_event->user_id = $request->user()->id;
         $assessment_event->department_id = $request->user()->department_id;
         $assessment_event->teacher_id = $request->teacher_id;
@@ -131,9 +131,9 @@ class AssessmentEventController extends Controller
         $assessment_event->save();
 
         // assessment_event_students
-        $student_group_members = student_group_member::where('group_id', $assessment_event->group_id)->get();
+        $student_group_members = StudentGroupMember::where('group_id', $assessment_event->group_id)->get();
         foreach ($student_group_members as $student) {
-            $assessment_event_student = new assessment_event_student;
+            $assessment_event_student = new AssessmentEventStudent;
             $assessment_event_student->event_id = $assessment_event->id;
             $assessment_event_student->department_id = $student->department_id;
             $assessment_event_student->group_id = $student->group_id;
@@ -150,7 +150,7 @@ class AssessmentEventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function edit(assessment_event $assessment_event)
+    public function edit(AssessmentEvent $assessment_event)
     {
         $teachers = User::where('department_id', $assessment_event->department_id)
             ->where(function ($query) {
@@ -158,8 +158,8 @@ class AssessmentEventController extends Controller
                     ->orWhere('role', 'teacher');
             })->get();
 
-        $courses = course::where('department_id', $assessment_event->department_id)->get();
-        $groups = student_group::where('department_id', $assessment_event->department_id)->get();
+        $courses = Course::where('department_id', $assessment_event->department_id)->get();
+        $groups = StudentGroup::where('department_id', $assessment_event->department_id)->get();
 
         return view('teacher.assessment_events_edit', [
             'assessment_event' => $assessment_event,
@@ -174,7 +174,7 @@ class AssessmentEventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, assessment_event $assessment_event)
+    public function update(Request $request, AssessmentEvent $assessment_event)
     {
         $request->validate([
             'teacher_id' => ['required', 'numeric'],
@@ -213,10 +213,10 @@ class AssessmentEventController extends Controller
         $assessment_event->save();
 
         if ($assessment_event->wasChanged('group_id')) {
-            assessment_event_student::where('event_id', $assessment_event->id)->delete();
-            $student_group_members = student_group_member::where('group_id', $assessment_event->group_id)->get();
+            AssessmentEventStudent::where('event_id', $assessment_event->id)->delete();
+            $student_group_members = StudentGroupMember::where('group_id', $assessment_event->group_id)->get();
             foreach ($student_group_members as $student) {
-                $assessment_event_student = new assessment_event_student;
+                $assessment_event_student = new AssessmentEventStudent;
                 $assessment_event_student->event_id = $assessment_event->id;
                 $assessment_event_student->department_id = $student->department_id;
                 $assessment_event_student->group_id = $student->group_id;
@@ -234,7 +234,7 @@ class AssessmentEventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroy(assessment_event $assessment_event)
+    public function destroy(AssessmentEvent $assessment_event)
     {
         $this->authorize('delete', $assessment_event);
         $assessment_event->delete();
@@ -247,21 +247,21 @@ class AssessmentEventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public static function getFeedbackEvents(assessment_event_student $assessment_event_student): Collection
+    public static function getFeedbackEvents(AssessmentEventStudent $assessment_event_student): Collection
     {
-        $event_ids = assessment_event_student::where('student_id', $assessment_event_student->student_id)->get()
+        $event_ids = AssessmentEventStudent::where('student_id', $assessment_event_student->student_id)->get()
             ->pluck('event_id')
             ->unique();
 
-        $assessment_events = assessment_event::whereIn('id', $event_ids)
+        $assessment_events = AssessmentEvent::whereIn('id', $event_ids)
             ->get();
 
-        $notYetSubmittedEvents = $assessment_events->filter(function (assessment_event $value, int $key) use ($assessment_event_student) {
-            return ($value->stop_time >= Carbon::now()->format(config('datetimeformat.date_time_format'))) && (assessment_status::where('event_id', $value->id)->where('student_id', $assessment_event_student->student_id)->count() == 0);
+        $notYetSubmittedEvents = $assessment_events->filter(function (AssessmentEvent $value, int $key) use ($assessment_event_student) {
+            return ($value->stop_time >= Carbon::now()->format(config('datetimeformat.date_time_format'))) && (AssessmentStatus::where('event_id', $value->id)->where('student_id', $assessment_event_student->student_id)->count() == 0);
         });
 
-        $submittedEvents = $assessment_events->filter(function (assessment_event $value, int $key) use ($assessment_event_student) {
-            return assessment_status::where('event_id', $value->id)->where('student_id', $assessment_event_student->student_id)->count();
+        $submittedEvents = $assessment_events->filter(function (AssessmentEvent $value, int $key) use ($assessment_event_student) {
+            return AssessmentStatus::where('event_id', $value->id)->where('student_id', $assessment_event_student->student_id)->count();
         });
 
         return collect(['submitted' => $submittedEvents, 'notYetSubmitted' => $notYetSubmittedEvents]);

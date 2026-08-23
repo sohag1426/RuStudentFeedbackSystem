@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\assessment_event;
-use App\Models\assessment_event_student;
+use App\Models\AssessmentEvent;
+use App\Models\AssessmentEventStudent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Spatie\SimpleExcel\SimpleExcelReader;
@@ -13,12 +13,12 @@ class AssessmentEventStudentController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  \App\Models\assessment_event  $assessment_event
+     * @param  \App\Models\AssessmentEvent  $assessment_event
      * @return \Illuminate\Http\Response
      */
-    public function index(assessment_event $assessment_event)
+    public function index(AssessmentEvent $assessment_event)
     {
-        $students = assessment_event_student::where('event_id', $assessment_event->id)->get();
+        $students = AssessmentEventStudent::where('event_id', $assessment_event->id)->get();
 
         return view('teacher.event_students', [
             'assessment_event' => $assessment_event,
@@ -29,10 +29,10 @@ class AssessmentEventStudentController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param  \App\Models\assessment_event  $assessment_event
+     * @param  \App\Models\AssessmentEvent  $assessment_event
      * @return \Illuminate\Http\Response
      */
-    public function create(assessment_event $assessment_event)
+    public function create(AssessmentEvent $assessment_event)
     {
         return view('teacher.event-students-create', [
             'assessment_event' => $assessment_event,
@@ -43,10 +43,10 @@ class AssessmentEventStudentController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\assessment_event  $assessment_event
+     * @param  \App\Models\AssessmentEvent  $assessment_event
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, assessment_event $assessment_event)
+    public function store(Request $request, AssessmentEvent $assessment_event)
     {
 
         $request->validate([
@@ -69,7 +69,7 @@ class AssessmentEventStudentController extends Controller
             if (count($key_diff)) {
                 continue;
             }
-            assessment_event_student::updateOrCreate(
+            AssessmentEventStudent::updateOrCreate(
                 ['event_id' => $assessment_event->id, 'department_id' => $assessment_event->department_id, 'student_id' => trim((string) $row['student_id'])],
                 ['name' => trim((string) $row['name'])]
             );
@@ -83,11 +83,11 @@ class AssessmentEventStudentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\assessment_event  $assessment_event
-     * @param  \App\Models\assessment_event_student  $assessment_event_student
+     * @param  \App\Models\AssessmentEvent  $assessment_event
+     * @param  \App\Models\AssessmentEventStudent  $assessment_event_student
      * @return \Illuminate\Http\Response
      */
-    public function destroy(assessment_event $assessment_event, assessment_event_student $assessment_event_student)
+    public function destroy(AssessmentEvent $assessment_event, AssessmentEventStudent $assessment_event_student)
     {
         $assessment_event_student->delete();
         return redirect()->route('assessment_events.assessment_event_students.index', ['assessment_event' => $assessment_event]);

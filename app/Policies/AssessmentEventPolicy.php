@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
-use App\Models\assessment;
-use App\Models\assessment_event;
-use App\Models\detailed_score;
+use App\Models\Assessment;
+use App\Models\AssessmentEvent;
+use App\Models\DetailedScore;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -18,14 +18,14 @@ class AssessmentEventPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function generateReport(User $user, assessment_event $assessmentEvent): bool
+    public function generateReport(User $user, AssessmentEvent $assessmentEvent): bool
     {
         if ($user->department_id !== $assessmentEvent->department_id) {
             return false;
         }
 
         if ($user->role === 'DepartmentChair' || $user->id === $assessmentEvent->teacher_id || $user->id === $assessmentEvent->user_id) {
-            return assessment::where('event_id', $assessmentEvent->id)->exists();
+            return Assessment::where('event_id', $assessmentEvent->id)->exists();
         }
 
         return false;
@@ -36,14 +36,14 @@ class AssessmentEventPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function downloadReport(User $user, assessment_event $assessmentEvent): bool
+    public function downloadReport(User $user, AssessmentEvent $assessmentEvent): bool
     {
         if ($user->department_id !== $assessmentEvent->department_id) {
             return false;
         }
 
         if ($user->role === 'DepartmentChair' || $user->id === $assessmentEvent->teacher_id || $user->id === $assessmentEvent->user_id) {
-            return detailed_score::where('event_id', $assessmentEvent->id)->exists();
+            return DetailedScore::where('event_id', $assessmentEvent->id)->exists();
         }
 
         return false;
@@ -64,7 +64,7 @@ class AssessmentEventPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, assessment_event $assessmentEvent)
+    public function view(User $user, AssessmentEvent $assessmentEvent)
     {
         //
     }
@@ -74,7 +74,7 @@ class AssessmentEventPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function viewScore(User $user, assessment_event $assessmentEvent): bool
+    public function viewScore(User $user, AssessmentEvent $assessmentEvent): bool
     {
         if ($user->department_id !== $assessmentEvent->department_id) {
             return false;
@@ -102,14 +102,14 @@ class AssessmentEventPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, assessment_event $assessmentEvent)
+    public function update(User $user, AssessmentEvent $assessmentEvent)
     {
-        if ($user->id !== $assessmentEvent->user_id) {
+        if ($user->id !== $assessmentEvent->user_id && $user->role !== 'DepartmentChair') {
             return false;
         }
 
         $now = Carbon::now();
-        $extendTime = Carbon::createFromFormat(config('datetimeformat.date_time_format'), $assessmentEvent->stop_time)->addDays(config('app.event_extend_limit'));
+        $extendTime = Carbon::parse($assessmentEvent->stop_time)->addDays(config('app.event_extend_limit', 30));
         if ($now->lessThan($extendTime)) {
             return true;
         }
@@ -122,7 +122,7 @@ class AssessmentEventPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, assessment_event $assessmentEvent)
+    public function delete(User $user, AssessmentEvent $assessmentEvent)
     {
         if ($user->id !== $assessmentEvent->user_id) {
             return false;
@@ -132,7 +132,7 @@ class AssessmentEventPolicy
             return false;
         }
 
-        if (assessment::where('event_id', $assessmentEvent->id)->count()) {
+        if (Assessment::where('event_id', $assessmentEvent->id)->exists()) {
             return false;
         }
 
@@ -144,7 +144,7 @@ class AssessmentEventPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, assessment_event $assessmentEvent)
+    public function restore(User $user, AssessmentEvent $assessmentEvent)
     {
         //
     }
@@ -154,7 +154,7 @@ class AssessmentEventPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, assessment_event $assessmentEvent)
+    public function forceDelete(User $user, AssessmentEvent $assessmentEvent)
     {
         //
     }

@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\student_group;
+use App\Models\StudentGroup;
 use Livewire\Component;
 
 class AdminDashboardFilter extends Component
@@ -29,7 +29,7 @@ class AdminDashboardFilter extends Component
     public function updated($name, $value)
     {
         if ($name == 'department_id') {
-            $this->student_groups = student_group::where('department_id', $value)->get();
+            $this->student_groups = StudentGroup::where('department_id', $value)->get();
         }
     }
 }

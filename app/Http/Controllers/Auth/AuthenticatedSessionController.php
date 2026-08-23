@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\StudentLoginController;
-use App\Models\log;
+use App\Models\Log as LogModel;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
@@ -61,7 +61,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         try {
-            $log = new log();
+            $log = new LogModel();
             $log->user_id = auth()->user()->id;
             $log->department_id = auth()->user()->department_id;
             $log->topic = 'Login';

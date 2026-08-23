@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\question;
+use App\Models\Question;
 use Illuminate\Http\Request;
 
 class QuestionController extends Controller
@@ -14,7 +14,7 @@ class QuestionController extends Controller
      */
     public function index(Request $request)
     {
-        $questions = question::all();
+        $questions = Question::all();
 
         return view('teacher.questions', [
             'questions' => $questions,
@@ -44,7 +44,7 @@ class QuestionController extends Controller
             'bn' => 'string|required',
         ]);
 
-        $question = new question();
+        $question = new Question();
         $question->department_id = $request->user()->department_id;
         $question->en = $request->en;
         $question->bn = $request->bn;
@@ -56,10 +56,10 @@ class QuestionController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\question  $question
+     * @param  \App\Models\Question  $question
      * @return \Illuminate\Http\Response
      */
-    public function edit(question $question)
+    public function edit(Question $question)
     {
         return view('teacher.questions-edit', [
             'question' => $question,
@@ -70,10 +70,10 @@ class QuestionController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\question  $question
+     * @param  \App\Models\Question  $question
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, question $question)
+    public function update(Request $request, Question $question)
     {
         $request->validate([
             'en' => 'string|required',

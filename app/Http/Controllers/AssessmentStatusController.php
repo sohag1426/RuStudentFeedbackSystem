@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\assessment_event;
-use App\Models\assessment_event_student;
-use App\Models\assessment_status;
+use App\Models\AssessmentEvent;
+use App\Models\AssessmentEventStudent;
+use App\Models\AssessmentStatus;
 
 class AssessmentStatusController extends Controller
 {
@@ -13,11 +13,11 @@ class AssessmentStatusController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(assessment_event $assessment_event)
+    public function index(AssessmentEvent $assessment_event)
     {
-        $assessment_statuses = assessment_status::where('event_id', $assessment_event->id)->get();
+        $assessment_statuses = AssessmentStatus::where('event_id', $assessment_event->id)->get();
 
-        $students = assessment_event_student::where('event_id', $assessment_event->id)->get();
+        $students = AssessmentEventStudent::where('event_id', $assessment_event->id)->get();
 
         $assessed = $students->filter(function ($value, $key) use ($assessment_statuses) {
             return $assessment_statuses->where('student_id', $value->student_id)->count() > 0;

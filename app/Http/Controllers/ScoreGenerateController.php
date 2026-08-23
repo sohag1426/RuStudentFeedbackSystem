@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\assessment;
-use App\Models\assessment_event;
-use App\Models\detailed_score;
+use App\Models\AssessmentEvent;
 use Illuminate\Http\Request;
 
 class ScoreGenerateController extends Controller
@@ -13,9 +11,10 @@ class ScoreGenerateController extends Controller
      * Handle the incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\AssessmentEvent  $assessment_event
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(Request $request, assessment_event $assessment_event)
+    public function __invoke(Request $request, AssessmentEvent $assessment_event)
     {
         $this->authorize('generateReport', [$assessment_event]);
 

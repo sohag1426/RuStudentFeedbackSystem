@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\department;
+use App\Models\Department;
 use Illuminate\Console\Command;
 
 class UpdateOrCreateDepartmentsCommand extends Command
@@ -99,8 +99,8 @@ class UpdateOrCreateDepartmentsCommand extends Command
 
         foreach ($departments as $department) {
 
-            if (department::where('en_name', $department)->count() == 0) {
-                $new_department = new department();
+            if (Department::where('en_name', $department)->count() == 0) {
+                $new_department = new Department();
                 $new_department->en_name = $department;
                 $new_department->save();
             }

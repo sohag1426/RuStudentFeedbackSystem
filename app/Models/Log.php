@@ -4,37 +4,45 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class log extends Model
+class Log extends Model
 {
     use HasFactory;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'logs';
+
+    /**
      * The attributes that aren't mass assignable.
      *
-     * @var array
+     * @var array<string>|bool
      */
     protected $guarded = [];
 
     /**
-     * Get the department
+     * Get the department.
      */
-    public function department()
+    public function department(): BelongsTo
     {
-        return $this->belongsTo(department::class, 'department_id', 'id')->withDefault();
+        return $this->belongsTo(Department::class, 'department_id', 'id')->withDefault();
     }
 
     /**
-     * Get the user
+     * Get the user who generated the log.
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id')->withDefault();
     }
 
     /**
-     * Get the user
+     * Get the parent loggable model.
      */
     public function model(): MorphTo
     {

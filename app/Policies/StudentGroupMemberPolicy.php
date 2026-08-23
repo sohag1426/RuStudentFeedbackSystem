@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\student_group_member;
+use App\Models\StudentGroupMember;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -25,7 +25,7 @@ class StudentGroupMemberPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, student_group_member $studentGroupMember)
+    public function view(User $user, StudentGroupMember $studentGroupMember)
     {
         //
     }
@@ -45,7 +45,7 @@ class StudentGroupMemberPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, student_group_member $studentGroupMember)
+    public function update(User $user, StudentGroupMember $studentGroupMember)
     {
         //
     }
@@ -55,9 +55,9 @@ class StudentGroupMemberPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, student_group_member $studentGroupMember)
+    public function delete(User $user, StudentGroupMember $studentGroupMember)
     {
-        if ($user->department_id == $studentGroupMember->department_id && $user->role == 'DepartmentManager') {
+        if ($user->department_id == $studentGroupMember->department_id && ($user->role == 'DepartmentManager' || $user->role == 'DepartmentChair')) {
             return true;
         }
 

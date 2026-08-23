@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class AssessmentStatus extends Model
+{
+    use HasFactory;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'assessment_statuses';
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array<string>|bool
+     */
+    protected $guarded = [];
+
+    /**
+     * Get the department.
+     */
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'department_id', 'id')->withDefault();
+    }
+
+    /**
+     * Get the assessment event.
+     */
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(AssessmentEvent::class, 'event_id', 'id')->withDefault();
+    }
+
+    /**
+     * Get the student record.
+     */
+    public function student(): BelongsTo
+    {
+        return $this->belongsTo(AssessmentEventStudent::class, 'student_id', 'student_id')->withDefault();
+    }
+}

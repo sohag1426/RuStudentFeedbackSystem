@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\department;
+use App\Models\Department;
 use Illuminate\Console\Command;
 
 class AddDepartmentCommand extends Command
@@ -28,7 +28,7 @@ class AddDepartmentCommand extends Command
     {
         $en_name = $this->ask('English Name?');
 
-        $department = new department();
+        $department = new Department();
         $department->en_name = $en_name;
         $department->save();
 

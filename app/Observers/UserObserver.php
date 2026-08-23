@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\log;
+use App\Models\Log;
 use App\Models\User;
 use Illuminate\Support\Facades\Log as FacadesLog;
 
@@ -15,12 +15,12 @@ class UserObserver
     {
         if (auth()->user()) {
             try {
-                $log = new log();
+                $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->department_id = auth()->user()->department_id;
                 $log->topic = 'Teacher/User created';
                 $log->log = 'Internet ID: '.$user->internet_id.' Name: '.$user->name;
-                $log->model_type = 'App\Models\User';
+                $log->model_type = User::class;
                 $log->model_id = $user->id;
                 $log->save();
             } catch (\Throwable $th) {

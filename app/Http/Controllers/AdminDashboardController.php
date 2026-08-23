@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\assessment_event;
-use App\Models\department;
+use App\Models\AssessmentEvent;
+use App\Models\Department;
 use Illuminate\Http\Request;
 
 class AdminDashboardController extends Controller
@@ -21,22 +21,22 @@ class AdminDashboardController extends Controller
                 $filter[] = ['group_id', '=', $request->group_id];
             }
 
-            $assessment_events = assessment_event::with(['teacher', 'course', 'group'])
+            $assessment_events = AssessmentEvent::with(['teacher', 'course', 'group'])
                 ->where($filter)
                 ->orderBy('id', 'desc')
                 ->paginate(50)
                 ->withQueryString();
 
-            $selectedDepartment = department::find($request->department_id);
+            $selectedDepartment = Department::find($request->department_id);
         } else {
-            $assessment_events = assessment_event::with(['teacher', 'course', 'group'])
+            $assessment_events = AssessmentEvent::with(['teacher', 'course', 'group'])
                 ->orderBy('id', 'desc')
                 ->paginate(20);
 
             $selectedDepartment = null;
         }
 
-        $departments = department::all();
+        $departments = Department::all();
 
         return view('admin.dashboard', [
             'assessment_events' => $assessment_events,

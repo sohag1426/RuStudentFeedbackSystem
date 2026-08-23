@@ -90,8 +90,8 @@ Bring codebase into compliance with PSR-12 and Laravel standard naming conventio
 ---
 
 ## Verification Criteria
-- [ ] All models adhere to PSR-4 PascalCase naming and load cleanly without autoloader warnings.
-- [ ] `UserRole` enum is in `app/Enums/UserRole.php` and referenced across the codebase.
-- [ ] Typo in `StudentLogoutController` and mail subject are fixed.
-- [ ] `ScoreGenerateJob` delegates directly to `ScoreService`.
-- [ ] Codebase passes PHP linting (`php -l`) and code style inspection.
+- [x] All models adhere to PSR-4 PascalCase naming and load cleanly without autoloader warnings.
+- [x] `UserRole` enum is in `app/Enums/UserRole.php` and referenced across the codebase.
+- [x] Typo in `StudentLogoutController` and mail subject are fixed.
+- [x] `ScoreGenerateJob` delegates directly to `ScoreService`.
+- [x] Codebase passes PHP linting (`php -l`) and code style inspection.

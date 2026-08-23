@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
-use App\Models\assessment_event;
-use App\Models\assessment_event_student;
-use App\Models\assessment_status;
-use App\Models\course;
-use App\Models\student_group;
-use App\Models\student_group_member;
+use App\Models\AssessmentEvent;
+use App\Models\AssessmentEventStudent;
+use App\Models\AssessmentStatus;
+use App\Models\Course;
+use App\Models\StudentGroup;
+use App\Models\StudentGroupMember;
 use App\Models\User;
 use App\Policies\AssessmentEventPolicy;
 use App\Policies\CoursePolicy;
@@ -25,10 +25,10 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
-        assessment_event::class => AssessmentEventPolicy::class,
-        student_group_member::class => StudentGroupMemberPolicy::class,
-        course::class => CoursePolicy::class,
-        student_group::class => StudentGroupPolicy::class,
+        AssessmentEvent::class => AssessmentEventPolicy::class,
+        StudentGroupMember::class => StudentGroupMemberPolicy::class,
+        Course::class => CoursePolicy::class,
+        StudentGroup::class => StudentGroupPolicy::class,
     ];
 
     /**

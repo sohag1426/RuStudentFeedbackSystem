@@ -19,10 +19,10 @@ use App\Http\Controllers\SampleExcel;
 use App\Http\Controllers\ScoreDownloadController;
 use App\Http\Controllers\ScoreGenerateController;
 use App\Http\Controllers\ScreenShotController;
-use App\Http\Controllers\StudenLogoutController;
 use App\Http\Controllers\StudentGroupController;
 use App\Http\Controllers\StudentGroupMemberController;
 use App\Http\Controllers\StudentLoginController;
+use App\Http\Controllers\StudentLogoutController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UsersProfileEditController;
 use Illuminate\Support\Facades\Route;
@@ -40,7 +40,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [StudentLoginController::class, 'create'])->name('student-login-form');
 Route::post('/student-login', [StudentLoginController::class, 'store'])->name('student-login');
-Route::resource('assessment_event_students.logout', StudenLogoutController::class)->only(['store']);
+Route::resource('assessment_event_students.logout', StudentLogoutController::class)->only(['store']);
 Route::resource('assessment_event_students.assessment_events', AssessmentController::class)
     ->only(['index', 'edit', 'update']);
 
