@@ -131,6 +131,48 @@
                             <p class="login-box-msg">Student Login</p>
                             <!--/Login Message-->
 
+                            <!-- Alert Messages -->
+                            @if (session('error'))
+                                <div class="alert alert-danger alert-dismissible fade show text-sm" role="alert">
+                                    <i class="fas fa-exclamation-circle mr-1"></i> {{ session('error') }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            @endif
+
+                            @if (session('info'))
+                                <div class="alert alert-info alert-dismissible fade show text-sm" role="alert">
+                                    <i class="fas fa-info-circle mr-1"></i> {{ session('info') }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            @endif
+
+                            @if (session('success'))
+                                <div class="alert alert-success alert-dismissible fade show text-sm" role="alert">
+                                    <i class="fas fa-check-circle mr-1"></i> {{ session('success') }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            @endif
+
+                            @if ($errors->any())
+                                <div class="alert alert-danger alert-dismissible fade show text-sm" role="alert">
+                                    <ul class="mb-0 pl-3">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            @endif
+                            <!-- /Alert Messages -->
+
                             <!--Login form-->
                             <form name="login" action="{{ route('student-login') }}" method="post"
                                 onsubmit="return showModal()">
@@ -139,8 +181,8 @@
 
                                 {{-- student_id --}}
                                 <div class="input-group mb-3">
-                                    <input type="text" name="student_id" class="form-control" placeholder="Student ID"
-                                        required>
+                                    <input type="text" name="student_id" value="{{ old('student_id') }}" class="form-control" placeholder="Student ID"
+                                        required autofocus>
                                     <div class="input-group-append">
                                         <div class="input-group-text">
                                             <span class="fas fa-user"></span>

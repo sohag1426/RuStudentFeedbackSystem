@@ -121,8 +121,8 @@ Harden user authorization, fix student session token validation, eliminate unhan
 ---
 
 ## Verification Criteria
-- [ ] Non-owner user cannot update another user's profile.
-- [ ] DepartmentChair and DepartmentManager can access and update their passwords.
-- [ ] Student session requires both valid session token and cache token to view or submit feedback.
-- [ ] External API downtime returns structured error array without corrupting HTTP output headers.
-- [ ] Sensitive developer routes (`logs`, `screenshot`) require Admin privileges.
+- [x] Non-owner user cannot update another user's profile.
+- [x] DepartmentChair and DepartmentManager can access and update their passwords.
+- [x] Student session requires both valid session token and cache token to view or submit feedback.
+- [x] External API downtime returns structured error array without corrupting HTTP output headers.
+- [x] Sensitive developer routes (`logs`, `screenshot`) require Admin privileges and SSRF protection.

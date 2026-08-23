@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class ChangePasswordController extends Controller
 {
@@ -15,9 +16,9 @@ class ChangePasswordController extends Controller
     public function create(Request $request)
     {
         return match ($request->user()->role) {
-            'admin' => view('admin.change-password'),
-            'teacher' => view('teacher.change-password'),
-            default => 'Not Found',
+            'admin', 'SuperAdmin' => view('admin.change-password'),
+            'teacher', 'DepartmentChair', 'DepartmentManager' => view('teacher.change-password'),
+            default => view('teacher.change-password'),
         };
     }
 
@@ -31,9 +32,15 @@ class ChangePasswordController extends Controller
     {
         $user = $request->user();
 
-        $request->validate([
-            'password' => 'required|confirmed|min:8',
-        ]);
+        $rules = [
+            'password' => ['required', 'confirmed', Password::min(8)],
+        ];
+
+        if (! empty($user->password)) {
+            $rules['current_password'] = ['required', 'current_password'];
+        }
+
+        $request->validate($rules);
 
         $user->password = Hash::make($request->password);
         $user->save();

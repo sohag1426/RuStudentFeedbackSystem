@@ -6,6 +6,9 @@ use App\Models\assessment_event_student;
 use App\Models\department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class StudentLoginController extends Controller
 {
@@ -31,27 +34,32 @@ class StudentLoginController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'student_id' => 'required|numeric',
+            'student_id' => 'required|string',
             'password' => 'required|string',
         ]);
 
         // student count
         $student_count = assessment_event_student::where('student_id', $request->student_id)->count();
         if ($student_count == 0) {
-            return redirect()->route('student-login-form')->with('info', 'There is no course available for you to provide feedback');
+            return redirect()->route('student-login-form')
+                ->withInput($request->only('student_id'))
+                ->with('error', 'There is no course available for you to provide feedback.');
         }
 
         $assessment_event_student = assessment_event_student::where('student_id', $request->student_id)->first();
 
         // check password
         $verify = $this->verify($request->student_id, $request->password);
-        if ($verify['error_code'] !== 0) {
-            return redirect()->route('student-login-form')->with('info', 'Wrong Student Information');
+        if (! isset($verify['error_code']) || $verify['error_code'] !== 0) {
+            return redirect()->route('student-login-form')
+                ->withInput($request->only('student_id'))
+                ->with('error', 'Invalid Student ID or Password. Please try again.');
         }
 
-        // add token
-        $token = random_int(100000000, 999999999);
-        Cache::put($assessment_event_student->id, $token, now()->addMinutes(120));
+        // add session and cache token
+        $token = Str::random(40);
+        Cache::put('student_token_' . $assessment_event_student->id, $token, now()->addMinutes(120));
+        $request->session()->put('student_auth_token_' . $assessment_event_student->id, $token);
 
         // show available assessments
         return redirect()->route('assessment_event_students.assessment_events.index', ['assessment_event_student' => $assessment_event_student]);
@@ -60,59 +68,39 @@ class StudentLoginController extends Controller
     /**
      * Verify Internet ID and Password
      *
-     * @param  int $internet_id
-     * @param  string $model
-     * @return \Illuminate\Http\Response
-     *	Response On Success
-     *	====================
-     *	Array
-     *	(
-     *	    [error_code]  => 0
-     *	    [name]        => A. F. M. Mahbubur Rahman
-     *	    [designation] => Lecturer
-     *	    [department]  => Computer Science & Engineering
-     *	)
-     *
-     * 	Response On Error
-     * 	=================
-     * 	Array
-     *	(
-     *	    [error_code]  => 3
-     *	    [name]        => 0
-     *	    [designation] => 0
-     *	    [department]  => 0
-     *	)
+     * @param  string $user
+     * @param  string $password
+     * @return array
      */
-    public static function verify(string $user, string $password)
+    public static function verify(string $user, string $password): array
     {
-        $url = config('verify.url');
-        $ru_user = $user;
-        $ru_pass = $password;
+        try {
+            $url = config('verify.url');
+            $request_data = [
+                'ru_user' => $user,
+                'ru_pass' => $password,
+                'key'     => config('verify.key'),
+            ];
 
-        $request_data = array(
-            "ru_user" => $ru_user,
-            "ru_pass" => $ru_pass,
-            "key"     => config('verify.key')
-        );
+            $data_string = base64_encode(json_encode($request_data));
 
-        $data_string = base64_encode(json_encode($request_data));
+            $response = Http::timeout(10)
+                ->withBody($data_string, 'text/plain')
+                ->post($url);
 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-
-        $result = curl_exec($ch);
-
-        // $result;
-        if (curl_errno($ch)) {
-            $msg_status = curl_strerror(curl_errno($ch));
-            echo $msg_status;
+            if ($response->successful()) {
+                $decoded = json_decode(base64_decode($response->body()), true);
+                if (is_array($decoded) && isset($decoded['error_code'])) {
+                    return $decoded;
+                }
+            }
+        } catch (\Throwable $th) {
+            Log::error('Student verification error: ' . $th->getMessage());
         }
 
-        $result_array = json_decode(base64_decode($result), true);
-
-        return $result_array;
+        return [
+            'error_code' => 1,
+            'message' => 'Verification failed',
+        ];
     }
 }
