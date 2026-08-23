@@ -56,9 +56,6 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::resource('questions', QuestionController::class)->only(['index']);
     Route::resource('assessment_events.status', AssessmentStatusController::class)->only('index');
     Route::get('sample-excel', SampleExcel::class)->name('sample-excel');
-});
-
-Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::resource('assessment_events', AssessmentEventController::class)->except(['show']);
     Route::resource('assessment_events.extend_time', AssessmentEventTimeExtendController::class)->only(['create', 'store']);
     Route::resource('assessment_events.assessment_event_students', AssessmentEventStudentController::class)->only(['index', 'create', 'store', 'destroy']);

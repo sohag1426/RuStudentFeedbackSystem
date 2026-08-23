@@ -19,6 +19,12 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            'internet_id' => fake()->unique()->numerify('########'),
+            'department_id' => 1,
+            'role' => 'teacher',
+            'mobile' => fake()->phoneNumber(),
+            'designation' => 'LECTURER',
+            'department' => 'Computer Science & Engineering',
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
