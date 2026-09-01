@@ -32,7 +32,7 @@ class AdminReportController extends Controller
     public function departmentDownload(Department $department)
     {
         $events = AssessmentEvent::where('department_id', $department->id)
-            ->with(['teacher', 'course'])
+            ->with(['teacher', 'course', 'group'])
             ->orderBy('teacher_id')
             ->get();
             
@@ -41,7 +41,7 @@ class AdminReportController extends Controller
         }
 
         foreach ($events as $event) {
-            if ($event->score === 'undefined') {
+            if ($event->score === 'undefined' || $event->feedback_percentage == 0) {
                 \App\Services\ScoreService::generateScore($event);
             }
         }
@@ -53,7 +53,7 @@ class AdminReportController extends Controller
     public function teacherDownload(User $teacher)
     {
         $events = AssessmentEvent::where('teacher_id', $teacher->id)
-            ->with(['department', 'course'])
+            ->with(['department', 'course', 'group'])
             ->get();
             
         if ($events->isEmpty()) {
@@ -61,7 +61,7 @@ class AdminReportController extends Controller
         }
 
         foreach ($events as $event) {
-            if ($event->score === 'undefined') {
+            if ($event->score === 'undefined' || $event->feedback_percentage == 0) {
                 \App\Services\ScoreService::generateScore($event);
             }
         }

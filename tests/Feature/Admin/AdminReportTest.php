@@ -53,6 +53,7 @@ class AdminReportTest extends TestCase
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'name' => '2023-1',
+            'session' => '2026-2027',
             'year' => '1st Year',
             'semester' => '1st Semester',
         ]);
@@ -63,6 +64,9 @@ class AdminReportTest extends TestCase
             'teacher_id' => $this->teacher->id,
             'course_id' => $this->course->id,
             'group_id' => $this->group->id,
+            'session' => '2026-2027',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
             'start_time' => Carbon::now()->subDays(2),
             'stop_time' => Carbon::now()->addDays(2),
             'score' => 4.5,
@@ -99,5 +103,45 @@ class AdminReportTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
+    }
+
+    public function test_department_report_view_includes_session_year_semester_and_feedback_percentage()
+    {
+        $this->event->feedback_percentage = 85.5;
+        $this->event->save();
+
+        $view = $this->view('admin.reports.pdf_department', [
+            'department' => $this->department,
+            'events' => collect([$this->event]),
+        ]);
+
+        $view->assertSee('<th>Session</th>', false);
+        $view->assertSee('<th>Year</th>', false);
+        $view->assertSee('<th>Semester</th>', false);
+        $view->assertSee('<th>%Feedback</th>', false);
+        $view->assertSee('2026-2027');
+        $view->assertSee('1st Year');
+        $view->assertSee('1st Semester');
+        $view->assertSee('85.5%');
+    }
+
+    public function test_teacher_report_view_includes_session_year_semester_and_feedback_percentage()
+    {
+        $this->event->feedback_percentage = 92.0;
+        $this->event->save();
+
+        $view = $this->view('admin.reports.pdf_teacher', [
+            'teacher' => $this->teacher,
+            'events' => collect([$this->event]),
+        ]);
+
+        $view->assertSee('<th>Session</th>', false);
+        $view->assertSee('<th>Year</th>', false);
+        $view->assertSee('<th>Semester</th>', false);
+        $view->assertSee('<th>%Feedback</th>', false);
+        $view->assertSee('2026-2027');
+        $view->assertSee('1st Year');
+        $view->assertSee('1st Semester');
+        $view->assertSee('92%');
     }
 }
