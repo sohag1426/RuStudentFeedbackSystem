@@ -68,6 +68,12 @@
                         <p>Report By Teacher</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin-analytics.index') }}" class="nav-link @if (request()->routeIs('admin-analytics.*')) active @endif">
+                        <i class="fas fa-chart-line"></i>
+                        <p>Analytics</p>
+                    </a>
+                </li>
                 {{-- Reports --}}
 
                 {{-- Login History --}}
