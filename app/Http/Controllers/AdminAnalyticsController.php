@@ -30,15 +30,21 @@ class AdminAnalyticsController extends Controller
         $sessions = array_values(array_unique(array_merge($serviceSessions, $existingSessions)));
         rsort($sessions);
 
-        $query = $this->buildFilterQuery($request);
-        $events = $query->paginate(50)->withQueryString();
+        $hasFilters = $this->hasActiveFilters($request);
+        $events = null;
+
+        if ($hasFilters) {
+            $query = $this->buildFilterQuery($request);
+            $events = $query->paginate(50)->withQueryString();
+        }
 
         return view('admin.analytics.index', compact(
             'departments',
             'years',
             'semesters',
             'sessions',
-            'events'
+            'events',
+            'hasFilters'
         ));
     }
 
@@ -47,6 +53,11 @@ class AdminAnalyticsController extends Controller
      */
     public function download(Request $request)
     {
+        if (! $this->hasActiveFilters($request)) {
+            return redirect()->route('admin-analytics.index')
+                ->with('error', 'Please apply at least one filter before downloading the report.');
+        }
+
         $query = $this->buildFilterQuery($request);
         $events = $query->get();
 
@@ -171,5 +182,20 @@ class AdminAnalyticsController extends Controller
         }
 
         return $filters;
+    }
+
+    /**
+     * Determine whether any filter criteria is active in the request.
+     */
+    private function hasActiveFilters(Request $request): bool
+    {
+        return $request->filled('department_id')
+            || $request->filled('session')
+            || $request->filled('year')
+            || $request->filled('semester')
+            || $request->filled('start_time')
+            || $request->filled('stop_time')
+            || $request->filled('score')
+            || $request->filled('feedback_percentage');
     }
 }

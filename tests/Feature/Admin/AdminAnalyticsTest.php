@@ -106,15 +106,27 @@ class AdminAnalyticsTest extends TestCase
         $response->assertRedirect(route('admin-login'));
     }
 
-    public function test_admin_can_view_analytics_page()
+    public function test_admin_can_view_analytics_page_without_filter()
     {
         $response = $this->actingAs($this->admin, 'admin')->get(route('admin-analytics.index'));
         $response->assertStatus(200);
         $response->assertSee('Analytics');
         $response->assertSee('Filter Assessment Events');
+        $response->assertDontSee('Download PDF');
+        $response->assertDontSee('Results (Total:');
+        $response->assertViewHas('hasFilters', false);
+        $response->assertViewHas('events', null);
+    }
+
+    public function test_admin_sees_results_and_download_button_with_filter()
+    {
+        $response = $this->actingAs($this->admin, 'admin')->get(route('admin-analytics.index', [
+            'session' => '2026-2027',
+        ]));
+        $response->assertStatus(200);
+        $response->assertSee('Results (Total:');
         $response->assertSee('Download PDF');
-        $response->assertSee('2026-2027');
-        $response->assertSee('2025-2026');
+        $response->assertViewHas('hasFilters', true);
     }
 
     public function test_admin_can_filter_by_department()
@@ -223,5 +235,12 @@ class AdminAnalyticsTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
+    }
+
+    public function test_cannot_download_analytics_without_filter()
+    {
+        $response = $this->actingAs($this->admin, 'admin')->get(route('admin-analytics.download'));
+        $response->assertRedirect(route('admin-analytics.index'));
+        $response->assertSessionHas('error');
     }
 }

@@ -138,6 +138,7 @@ Analytics
     </div>
 </div>
 
+@if ($hasFilters && $events)
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0">
@@ -210,4 +211,5 @@ Analytics
     </div>
     @endif
 </div>
+@endif
 @endsection
