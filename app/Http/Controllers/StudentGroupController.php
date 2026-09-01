@@ -6,6 +6,7 @@ use App\Enums\Semester;
 use App\Enums\Year;
 use App\Models\Log;
 use App\Models\StudentGroup;
+use App\Services\SessionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rules\Enum;
@@ -37,6 +38,7 @@ class StudentGroupController extends Controller
         return view('teacher.student_group_create', [
             'years' => Year::cases(),
             'semesters' => Semester::cases(),
+            'sessions' => SessionService::getSessions(),
         ]);
     }
 
@@ -51,12 +53,14 @@ class StudentGroupController extends Controller
             'name' => 'required|string',
             'year' => ['required', new Enum(Year::class)],
             'semester' => ['required', new Enum(Semester::class)],
+            'session' => 'required|string',
         ]);
 
         if (StudentGroup::where('department_id', $request->user()->department_id)
             ->where('name', $request->name)
             ->where('year', $request->year)
             ->where('semester', $request->semester)
+            ->where('session', $request->session)
             ->exists()) {
             return redirect()->route('student_groups.index')->with('info', 'Duplicate Student Group');
         }
@@ -67,6 +71,7 @@ class StudentGroupController extends Controller
         $student_group->name = $request->name;
         $student_group->year = $request->year;
         $student_group->semester = $request->semester;
+        $student_group->session = $request->session;
         $student_group->save();
 
         return redirect()->route('student_groups.index');
@@ -83,6 +88,7 @@ class StudentGroupController extends Controller
             'student_group' => $student_group,
             'years' => Year::cases(),
             'semesters' => Semester::cases(),
+            'sessions' => SessionService::getDropdownSessions($student_group->session),
         ]);
     }
 
@@ -97,12 +103,14 @@ class StudentGroupController extends Controller
             'name' => 'required|string',
             'year' => ['required', new Enum(Year::class)],
             'semester' => ['required', new Enum(Semester::class)],
+            'session' => 'required|string',
         ]);
 
         if (StudentGroup::where('department_id', $request->user()->department_id)
             ->where('name', $request->name)
             ->where('year', $request->year)
             ->where('semester', $request->semester)
+            ->where('session', $request->session)
             ->where('id', '!=', $student_group->id)
             ->exists()) {
             return redirect()->route('student_groups.index')->with('info', 'Duplicate Student Group');
@@ -113,10 +121,11 @@ class StudentGroupController extends Controller
         $student_group->name = $request->name;
         $student_group->year = $request->year;
         $student_group->semester = $request->semester;
+        $student_group->session = $request->session;
         $student_group->save();
 
         // log
-        if ($student_group->wasChanged(['name', 'year', 'semester'])) {
+        if ($student_group->wasChanged(['name', 'year', 'semester', 'session'])) {
             $log_message = 'student group was changed from ' . $oldName . ' to ' . $student_group->name;
             $log = new Log();
             $log->user_id = $request->user()->id;
@@ -148,9 +157,7 @@ class StudentGroupController extends Controller
         $log->user_id = $request->user()->id;
         $log->department_id = $request->user()->department_id;
         $log->topic = 'student group deleted';
-        $yearVal = $student_group->year instanceof Year ? $student_group->year->value : $student_group->year;
-        $semVal = $student_group->semester instanceof Semester ? $student_group->semester->value : $student_group->semester;
-        $log->log = 'student group deleted: ' . ($yearVal && $semVal ? $yearVal . ', ' . $semVal : $student_group->name);
+        $log->log = 'student group deleted: ' . $student_group->display_name;
         $log->model_type = StudentGroup::class;
         $log->model_id = $student_group->id;
         $log->save();

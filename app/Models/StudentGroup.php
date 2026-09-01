@@ -28,6 +28,15 @@ class StudentGroup extends Model
     protected $guarded = [];
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'session' => null,
+    ];
+
+    /**
      * The attributes that should be cast.
      *
      * @var array<string, string>
@@ -77,8 +86,14 @@ class StudentGroup extends Model
         $yearVal = $this->year instanceof Year ? $this->year->value : $this->year;
         $semesterVal = $this->semester instanceof Semester ? $this->semester->value : $this->semester;
 
-        if ($yearVal && $semesterVal) {
-            return $yearVal . ', ' . $semesterVal;
+        $parts = array_filter([
+            $this->session,
+            $yearVal,
+            $semesterVal,
+        ]);
+
+        if (! empty($parts)) {
+            return implode(', ', $parts);
         }
 
         return (string) $this->name;

@@ -50,6 +50,25 @@
                         </div>
                         <!--/name-->
 
+                        <!--session-->
+                        <div class="form-group">
+                            <label for="session"><span class="text-danger">*</span>Session</label>
+                            <select name="session" id="session" class="form-control @error('session') is-invalid @enderror" required>
+                                <option value="">Select Session</option>
+                                @foreach ($sessions ?? \App\Services\SessionService::getSessions() as $sessionOption)
+                                    <option value="{{ $sessionOption }}" {{ old('session') == $sessionOption ? 'selected' : '' }}>
+                                        {{ $sessionOption }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('session')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                        <!--/session-->
+
                         <!--year-->
                         <div class="form-group">
                             <label for="year"><span class="text-danger">*</span>Year</label>
