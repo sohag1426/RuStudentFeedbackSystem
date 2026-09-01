@@ -70,12 +70,19 @@
                         <!--group_id-->
                         <div class="form-group">
                             <label for="group_id">Student Group</label>
-                            <select class="form-control" id="group_id" name="group_id" required>
+                            <select class="form-control @error('group_id') is-invalid @enderror" id="group_id" name="group_id" required>
                                 <option value="">Please select...</option>
                                 @foreach ($groups as $group)
-                                    <option value="{{ $group->id }}">{{ $group->display_name }}</option>
+                                    <option value="{{ $group->id }}" {{ old('group_id') == $group->id ? 'selected' : '' }}>
+                                        {{ $group->display_name }}
+                                    </option>
                                 @endforeach
                             </select>
+                            @error('group_id')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
                         <!--/group_id-->
 

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Assessment;
 use App\Models\AssessmentEvent;
+use App\Models\AssessmentEventStudent;
 use App\Models\AssessmentStatus;
 use App\Models\DetailedScore;
 use Illuminate\Support\Facades\DB;
@@ -28,10 +29,15 @@ class ScoreService
             $total_score = $assessments->sum('score');
             $average_score = $total_score / $assessments_count;
 
+            $total_students = AssessmentEventStudent::where('event_id', $assessment_event->id)->count();
             $distinct_students = AssessmentStatus::where('event_id', $assessment_event->id)->count();
 
             $assessment_event->score = round($average_score, 2);
             $assessment_event->assessment_count = $distinct_students > 0 ? $distinct_students : max(1, $assessments->groupBy('student_id')->count());
+            $done_count = $distinct_students > 0 ? $distinct_students : $assessments->groupBy('student_id')->count();
+            $assessment_event->feedback_percentage = ($total_students > 0 && $done_count > 0)
+                ? round(($done_count / $total_students) * 100, 2)
+                : 0;
             $assessment_event->save();
 
             // detailed score

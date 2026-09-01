@@ -46,40 +46,27 @@
 
                         @method('put')
 
-                        <!--teacher_id-->
+                        <!--teacher-->
                         <div class="form-group">
-                            <label for="teacher_id">Teacher</label>
-                            <select class="form-control" id="teacher_id" name="teacher_id" required>
-                                <option value="{{ $assessment_event->teacher_id }}">{{ $assessment_event->teacher->name }}
-                                </option>
-                            </select>
+                            <label for="teacher">Teacher</label>
+                            <input type="text" class="form-control" id="teacher" value="{{ $assessment_event->teacher->name }}" disabled>
                         </div>
-                        <!--/teacher_id-->
+                        <!--/teacher-->
 
-                        <!--course_id-->
+                        <!--course-->
                         <div class="form-group">
-                            <label for="course_id">Course</label>
-                            <select class="form-control" id="course_id" name="course_id" required>
-                                <option value="{{ $assessment_event->course_id }}">{{ $assessment_event->course->name }}
-                                </option>
-                                @foreach ($courses as $course)
-                                    <option value="{{ $course->id }}">{{ $course->name }}</option>
-                                @endforeach
-                            </select>
+                            <label for="course">Course</label>
+                            <input type="text" class="form-control" id="course" value="{{ $assessment_event->course->name }} ({{ $assessment_event->course->code }})" disabled>
                         </div>
-                        <!--/course_id-->
+                        <!--/course-->
 
-                        <!--group_id-->
+                        <!--group-->
                         <div class="form-group">
-                            <label for="group_id">Student Group</label>
-                            <select class="form-control" id="group_id" name="group_id" required>
-                                <option value="{{ $assessment_event->group_id }}">{{ $assessment_event->group->display_name }}</option>
-                                @foreach ($groups as $group)
-                                    <option value="{{ $group->id }}">{{ $group->display_name }}</option>
-                                @endforeach
-                            </select>
+                            <label for="group">Student Group</label>
+                            <input type="text" class="form-control" id="group" value="{{ $assessment_event->group->display_name ?? 'N/A' }}" disabled>
+                            <small class="form-text text-muted">Teacher, course, and student group cannot be modified after event creation.</small>
                         </div>
-                        <!--/group_id-->
+                        <!--/group-->
 
                         <div class="form-row">
 

@@ -98,4 +98,51 @@ class StudentGroup extends Model
 
         return (string) $this->name;
     }
+
+    /**
+     * Scope a query to only include student groups eligible for assessment events:
+     * non-empty session, year, semester, and at least 1 student member.
+     */
+    public function scopeEligibleForAssessment($query)
+    {
+        return $query->whereNotNull('session')
+            ->where('session', '!=', '')
+            ->whereNotNull('year')
+            ->where('year', '!=', '')
+            ->whereNotNull('semester')
+            ->where('semester', '!=', '')
+            ->has('members');
+    }
+
+    /**
+     * Alias for scopeEligibleForAssessment.
+     */
+    public function scopeReadyForAssessment($query)
+    {
+        return $this->scopeEligibleForAssessment($query);
+    }
+
+    /**
+     * Determine whether the student group is eligible for assessment events.
+     */
+    public function isEligibleForAssessment(): bool
+    {
+        $yearVal = $this->year instanceof Year ? $this->year->value : $this->year;
+        $semesterVal = $this->semester instanceof Semester ? $this->semester->value : $this->semester;
+
+        $hasSession = ! empty($this->session) && trim((string) $this->session) !== '';
+        $hasYear = ! empty($yearVal) && trim((string) $yearVal) !== '';
+        $hasSemester = ! empty($semesterVal) && trim((string) $semesterVal) !== '';
+        $hasStudents = $this->relationLoaded('members') ? $this->members->isNotEmpty() : $this->members()->exists();
+
+        return $hasSession && $hasYear && $hasSemester && $hasStudents;
+    }
+
+    /**
+     * Alias for isEligibleForAssessment.
+     */
+    public function isReadyForAssessment(): bool
+    {
+        return $this->isEligibleForAssessment();
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Semester;
+use App\Enums\Year;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +27,64 @@ class AssessmentEvent extends Model
      * @var array<string>|bool
      */
     protected $guarded = [];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'feedback_percentage' => 0,
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'year' => Year::class,
+        'semester' => Semester::class,
+        'feedback_percentage' => 'float',
+    ];
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (AssessmentEvent $event) {
+            if ($event->group_id && (! $event->session || ! $event->year || ! $event->semester)) {
+                $group = $event->group ?? StudentGroup::find($event->group_id);
+                if ($group) {
+                    $event->session = $event->session ?: $group->session;
+                    $event->year = $event->year ?: ($group->year instanceof Year ? $group->year->value : $group->year);
+                    $event->semester = $event->semester ?: ($group->semester instanceof Semester ? $group->semester->value : $group->semester);
+                }
+            }
+        });
+
+        static::updating(function (AssessmentEvent $event) {
+            if ($event->isDirty('teacher_id') && $event->getOriginal('teacher_id') !== null) {
+                $event->teacher_id = $event->getOriginal('teacher_id');
+            }
+            if ($event->isDirty('course_id') && $event->getOriginal('course_id') !== null) {
+                $event->course_id = $event->getOriginal('course_id');
+            }
+            if ($event->isDirty('group_id') && $event->getOriginal('group_id') !== null) {
+                $event->group_id = $event->getOriginal('group_id');
+            }
+            if ($event->isDirty('session') && $event->getOriginal('session') !== null) {
+                $event->session = $event->getOriginal('session');
+            }
+            if ($event->isDirty('year') && $event->getOriginal('year') !== null) {
+                $event->year = $event->getOriginal('year');
+            }
+            if ($event->isDirty('semester') && $event->getOriginal('semester') !== null) {
+                $event->semester = $event->getOriginal('semester');
+            }
+        });
+    }
 
     /**
      * Get the department.
@@ -107,26 +167,12 @@ class AssessmentEvent extends Model
     }
 
     /**
-     * Calculate feedback completion percentage.
+     * Get the feedback completion percentage.
      */
     public function feedbackPercentage(): Attribute
     {
         return Attribute::make(
-            get: function ($value, $attributes) {
-                $eventId = $attributes['id'] ?? null;
-                if (! $eventId) {
-                    return 0;
-                }
-
-                $studentCount = AssessmentEventStudent::where('event_id', $eventId)->count();
-                $done = AssessmentStatus::where('event_id', $eventId)->count();
-
-                if ($studentCount == 0 || $done == 0) {
-                    return 0;
-                }
-
-                return round((($done / $studentCount) * 100), 2);
-            },
+            get: fn ($value) => (float) ($value ?? 0),
         );
     }
 }

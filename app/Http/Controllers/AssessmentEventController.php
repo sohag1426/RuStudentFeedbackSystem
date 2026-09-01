@@ -75,7 +75,9 @@ class AssessmentEventController extends Controller
             })->get();
 
         $courses = Course::where('department_id', $request->user()->department_id)->get();
-        $groups = StudentGroup::where('department_id', $request->user()->department_id)->get();
+        $groups = StudentGroup::where('department_id', $request->user()->department_id)
+            ->eligibleForAssessment()
+            ->get();
 
         return view('teacher.assessment_events_create', [
             'teachers' => $teachers,
@@ -94,7 +96,19 @@ class AssessmentEventController extends Controller
         $request->validate([
             'teacher_id' => ['required', 'numeric'],
             'course_id' => ['required', 'numeric'],
-            'group_id' => 'required|numeric',
+            'group_id' => [
+                'required',
+                'numeric',
+                function ($attribute, $value, $fail) use ($request) {
+                    $group = StudentGroup::where('id', $value)
+                        ->where('department_id', $request->user()->department_id)
+                        ->first();
+
+                    if (! $group || ! $group->isEligibleForAssessment()) {
+                        $fail('The selected student group is invalid or not eligible for assessment. A valid session, year, semester, and at least one student are required.');
+                    }
+                },
+            ],
             'start_date' => 'required|string',
             'start_hour' => ['required', 'numeric'],
             'start_minute' => ['required', 'numeric'],
@@ -102,6 +116,17 @@ class AssessmentEventController extends Controller
             'stop_hour' => ['required', 'numeric'],
             'stop_minute' => ['required', 'numeric'],
         ]);
+
+        $group = StudentGroup::where('id', $request->group_id)
+            ->where('department_id', $request->user()->department_id)
+            ->first();
+
+        if (! $group || ! $group->isEligibleForAssessment()) {
+            return redirect()->route('assessment_events.create')
+                ->withInput()
+                ->with('info', 'The selected student group is invalid or has no students.')
+                ->withErrors(['group_id' => 'The selected student group is invalid or not eligible for assessment. A valid session, year, semester, and at least one student are required.']);
+        }
 
         $now = Carbon::now('Asia/Dhaka')->setHour(0)->setMinute(0);
 
@@ -126,6 +151,9 @@ class AssessmentEventController extends Controller
         $assessment_event->teacher_id = $request->teacher_id;
         $assessment_event->course_id = $request->course_id;
         $assessment_event->group_id = $request->group_id;
+        $assessment_event->session = $group->session;
+        $assessment_event->year = $group->year;
+        $assessment_event->semester = $group->semester;
         $assessment_event->start_time = $start_time;
         $assessment_event->stop_time = $stop_time;
         $assessment_event->save();
@@ -152,20 +180,8 @@ class AssessmentEventController extends Controller
      */
     public function edit(AssessmentEvent $assessment_event)
     {
-        $teachers = User::where('department_id', $assessment_event->department_id)
-            ->where(function ($query) {
-                $query->where('role', 'DepartmentChair')
-                    ->orWhere('role', 'teacher');
-            })->get();
-
-        $courses = Course::where('department_id', $assessment_event->department_id)->get();
-        $groups = StudentGroup::where('department_id', $assessment_event->department_id)->get();
-
         return view('teacher.assessment_events_edit', [
             'assessment_event' => $assessment_event,
-            'teachers' => $teachers,
-            'courses' => $courses,
-            'groups' => $groups,
         ]);
     }
 
@@ -177,9 +193,6 @@ class AssessmentEventController extends Controller
     public function update(Request $request, AssessmentEvent $assessment_event)
     {
         $request->validate([
-            'teacher_id' => ['required', 'numeric'],
-            'course_id' => ['required', 'numeric'],
-            'group_id' => 'required|numeric',
             'start_date' => 'required|string',
             'start_hour' => ['required', 'numeric'],
             'start_minute' => ['required', 'numeric'],
@@ -205,26 +218,9 @@ class AssessmentEventController extends Controller
             return redirect()->route('assessment_events.edit', ['assessment_event' => $assessment_event])->with('info', 'It is not possible to stop before the start time.');
         }
 
-        $assessment_event->teacher_id = $request->teacher_id;
-        $assessment_event->course_id = $request->course_id;
-        $assessment_event->group_id = $request->group_id;
         $assessment_event->start_time = $start_time;
         $assessment_event->stop_time = $stop_time;
         $assessment_event->save();
-
-        if ($assessment_event->wasChanged('group_id')) {
-            AssessmentEventStudent::where('event_id', $assessment_event->id)->delete();
-            $student_group_members = StudentGroupMember::where('group_id', $assessment_event->group_id)->get();
-            foreach ($student_group_members as $student) {
-                $assessment_event_student = new AssessmentEventStudent;
-                $assessment_event_student->event_id = $assessment_event->id;
-                $assessment_event_student->department_id = $student->department_id;
-                $assessment_event_student->group_id = $student->group_id;
-                $assessment_event_student->student_id = $student->student_id;
-                $assessment_event_student->name = $student->name;
-                $assessment_event_student->save();
-            }
-        }
 
         return redirect()->route('assessment_events.index');
     }
