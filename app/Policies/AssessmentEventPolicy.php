@@ -80,7 +80,7 @@ class AssessmentEventPolicy
             return false;
         }
 
-        if ($user->role === 'DepartmentChair' || $user->id === $assessmentEvent->teacher_id || $user->id === $assessmentEvent->user_id) {
+        if ($user->role === 'DepartmentChair' || $user->id === $assessmentEvent->teacher_id) {
             return true;
         }
 
