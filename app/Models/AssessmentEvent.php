@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Semester;
 use App\Enums\Year;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,6 +36,7 @@ class AssessmentEvent extends Model
      */
     protected $attributes = [
         'feedback_percentage' => 0,
+        'score' => 'undefined',
     ];
 
     /**
@@ -174,5 +176,59 @@ class AssessmentEvent extends Model
         return Attribute::make(
             get: fn ($value) => (float) ($value ?? 0),
         );
+    }
+
+    /**
+     * Scope a query to only include running assessment events.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Carbon\Carbon|string|null  $now
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeRunning($query, $now = null)
+    {
+        $now = $now ? Carbon::parse($now) : Carbon::now();
+
+        return $query->where('start_time', '<=', $now)
+            ->where('stop_time', '>=', $now);
+    }
+
+    /**
+     * Scope a query to only include assessment events that ended one day before.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Carbon\Carbon|string|null  $now
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeEndedOneDayBefore($query, $now = null)
+    {
+        $now = $now ? Carbon::parse($now) : Carbon::now();
+        $yesterdayStart = $now->copy()->subDay()->startOfDay();
+
+        return $query->where('start_time', '<=', $now)
+            ->where('stop_time', '<', $now)
+            ->where('stop_time', '>=', $yesterdayStart);
+    }
+
+    /**
+     * Scope a query to only include assessment events that are running or ended one day before.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Carbon\Carbon|string|null  $now
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeRunningOrEndedOneDayBefore($query, $now = null)
+    {
+        $now = $now ? Carbon::parse($now) : Carbon::now();
+        $yesterdayStart = $now->copy()->subDay()->startOfDay();
+
+        return $query->where('start_time', '<=', $now)
+            ->where(function ($q) use ($now, $yesterdayStart) {
+                $q->where('stop_time', '>=', $now)
+                    ->orWhere(function ($sub) use ($now, $yesterdayStart) {
+                        $sub->where('stop_time', '<', $now)
+                            ->where('stop_time', '>=', $yesterdayStart);
+                    });
+            });
     }
 }
