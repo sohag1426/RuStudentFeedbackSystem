@@ -37,6 +37,8 @@ class TeacherManagementTest extends TestCase
         $response = $this->actingAs($this->teacher)->get(route('users.index'));
 
         $response->assertStatus(200);
+        $response->assertSee('#');
+        $response->assertSee((string) $this->teacher->id);
         $response->assertSee('Internet ID');
         $response->assertSee('12345678');
         $response->assertSee('Dr. Test Teacher');
