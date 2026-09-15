@@ -66,6 +66,7 @@
 
                 <thead>
                     <tr>
+                        <th scope="col">Internet ID</th>
                         <th scope="col">Name</th>
                         <th scope="col">Email</th>
                         <th scope="col">Mobile</th>
@@ -75,6 +76,7 @@
                 <tbody>
                     @foreach ($users as $user)
                         <tr>
+                            <td>{{ $user->internet_id }}</td>
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->mobile }}</td>
