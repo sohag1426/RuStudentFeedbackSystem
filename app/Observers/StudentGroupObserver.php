@@ -15,11 +15,11 @@ class StudentGroupObserver
     {
         if (auth()->user()) {
             try {
-                $log = new Log();
+                $log = new Log;
                 $log->user_id = auth()->user()->id;
                 $log->department_id = auth()->user()->department_id;
                 $log->topic = 'student group created';
-                $log->log = 'name: ' . $student_group->name;
+                $log->log = 'name: '.$student_group->name;
                 $log->model_type = StudentGroup::class;
                 $log->model_id = $student_group->id;
                 $log->save();
@@ -37,11 +37,11 @@ class StudentGroupObserver
         if (auth()->user()) {
             if ($student_group->wasChanged('name')) {
                 try {
-                    $log = new Log();
+                    $log = new Log;
                     $log->user_id = auth()->user()->id;
                     $log->department_id = auth()->user()->department_id;
                     $log->topic = 'student group name updated';
-                    $log->log = 'Original: ' . $student_group->getOriginal('name') . ' New: ' . $student_group->name;
+                    $log->log = 'Original: '.$student_group->getOriginal('name').' New: '.$student_group->name;
                     $log->model_type = StudentGroup::class;
                     $log->model_id = $student_group->id;
                     $log->save();
@@ -55,7 +55,7 @@ class StudentGroupObserver
     /**
      * Handle the student_group "deleted" event.
      */
-    public function deleted(student_group $student_group): void
+    public function deleted(StudentGroup $student_group): void
     {
         //
     }
@@ -63,7 +63,7 @@ class StudentGroupObserver
     /**
      * Handle the student_group "restored" event.
      */
-    public function restored(student_group $student_group): void
+    public function restored(StudentGroup $student_group): void
     {
         //
     }
@@ -71,7 +71,7 @@ class StudentGroupObserver
     /**
      * Handle the student_group "force deleted" event.
      */
-    public function forceDeleted(student_group $student_group): void
+    public function forceDeleted(StudentGroup $student_group): void
     {
         //
     }
