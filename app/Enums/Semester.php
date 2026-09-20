@@ -6,6 +6,7 @@ enum Semester: string
 {
     case FIRST = '1st Semester';
     case SECOND = '2nd Semester';
+    case THIRD = '3rd Semester';
 
     /**
      * Get all enum values as an array.

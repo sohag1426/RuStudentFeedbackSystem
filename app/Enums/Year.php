@@ -8,6 +8,7 @@ enum Year: string
     case SECOND = '2nd Year';
     case THIRD = '3rd Year';
     case FOURTH = '4th Year';
+    case MASTERS = 'Masters';
 
     /**
      * Get all enum values as an array.
