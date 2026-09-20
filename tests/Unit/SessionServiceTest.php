@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class SessionServiceTest extends TestCase
 {
-    public function test_get_sessions_returns_six_sessions_by_default()
+    public function test_get_sessions_returns_eight_sessions_by_default()
     {
         $sessions = SessionService::getSessions();
 
         $this->assertIsArray($sessions);
-        $this->assertCount(6, $sessions);
+        $this->assertCount(8, $sessions);
     }
 
     public function test_get_sessions_generates_expected_format_for_a_given_year()
