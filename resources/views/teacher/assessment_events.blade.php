@@ -9,8 +9,8 @@
 
 @section('activeLink')
     @php
-        $active_menu = '5';
-        $active_link = '1';
+        $activeMenu = $active_menu = '5';
+        $activeLink = $active_link = '1';
     @endphp
 @endsection
 
@@ -97,13 +97,15 @@
             </form>
             {{-- @endFilter --}}
 
-            <table id="data_table" class="table table-hover">
+            <table id="phpPaging" class="table table-hover">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">Teacher</th>
                         <th scope="col">Course</th>
-                        <th scope="col">Student Group</th>
+                        <th scope="col">Session</th>
+                        <th scope="col">Year</th>
+                        <th scope="col">Semester</th>
                         <th scope="col">Start Time</th>
                         <th scope="col">Stop Time</th>
                         <th scope="col">Created By</th>
@@ -113,44 +115,46 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($assessment_events as $assessment_event)
+                    @foreach ($assessmentEvents as $assessmentEvent)
                         <tr>
-                            <td scope="row">{{ $assessment_event->id }}</td>
-                            <td>{{ $assessment_event->teacher->name }}</td>
+                            <td scope="row">{{ $assessmentEvent->id }}</td>
+                            <td>{{ $assessmentEvent->teacher->name }}</td>
                             <td>
-                                {{ $assessment_event->course->name }} ({{ $assessment_event->course->code }})
+                                {{ $assessmentEvent->course->name }} ({{ $assessmentEvent->course->code }})
                             </td>
-                            <td>{{ $assessment_event->group->display_name }}</td>
-                            <td>{{ $assessment_event->start_time }}</td>
-                            <td>{{ $assessment_event->stop_time }}</td>
-                            <td>{{ $assessment_event->user->name }}</td>
+                            <td>{{ $assessmentEvent->session ?? $assessmentEvent->group?->session ?? '-' }}</td>
+                            <td>{{ $assessmentEvent->year?->value ?? $assessmentEvent->year ?? $assessmentEvent->group?->year?->value ?? $assessmentEvent->group?->year ?? '-' }}</td>
+                            <td>{{ $assessmentEvent->semester?->value ?? $assessmentEvent->semester ?? $assessmentEvent->group?->semester?->value ?? $assessmentEvent->group?->semester ?? '-' }}</td>
+                            <td>{{ $assessmentEvent->start_time }}</td>
+                            <td>{{ $assessmentEvent->stop_time }}</td>
+                            <td>{{ $assessmentEvent->user->name }}</td>
 
-                            @if (auth()->user()->can('viewScore', $assessment_event))
-                                <td>{{ $assessment_event->score }}</td>
+                            @if (auth()->user()->can('viewScore', $assessmentEvent))
+                                <td>{{ $assessmentEvent->score }}</td>
                             @else
                                 <td>***</td>
                             @endif
 
-                            <td>{{ $assessment_event->feedback_percentage }} %</td>
+                            <td>{{ $assessmentEvent->feedback_percentage }} %</td>
 
                             <td>
 
                                 <a class="btn btn-outline-info btn-sm mb-2"
-                                    href="{{ route('assessment_events.assessment_event_students.index', ['assessment_event' => $assessment_event]) }}">
+                                    href="{{ route('assessment_events.assessment_event_students.index', ['assessment_event' => $assessmentEvent]) }}">
                                     <i class="fas fa-info-circle"></i>
                                     Students
                                 </a>
 
                                 <a class="btn btn-outline-info btn-sm mb-2"
-                                    href="{{ route('assessment_events.status.index', ['assessment_event' => $assessment_event]) }}">
+                                    href="{{ route('assessment_events.status.index', ['assessment_event' => $assessmentEvent]) }}">
                                     <i class="fas fa-info-circle"></i>
                                     Feedback Status
                                 </a>
 
                                 {{-- Generate Report --}}
-                                @can('generateReport', $assessment_event)
+                                @can('generateReport', $assessmentEvent)
                                     <a class="btn btn-outline-info btn-sm mb-2"
-                                        href="{{ route('generate-score', ['assessment_event' => $assessment_event]) }}">
+                                        href="{{ route('generate-score', ['assessment_event' => $assessmentEvent]) }}">
                                         <i class="fas fa-user-edit"></i>
                                         Generate Report
                                     </a>
@@ -158,9 +162,9 @@
                                 {{-- Generate Report --}}
 
                                 {{-- Download Report --}}
-                                @can('downloadReport', $assessment_event)
+                                @can('downloadReport', $assessmentEvent)
                                     <a class="btn btn-outline-info btn-sm mb-2"
-                                        href="{{ route('download-score', ['assessment_event' => $assessment_event]) }}">
+                                        href="{{ route('download-score', ['assessment_event' => $assessmentEvent]) }}">
                                         <i class="fas fa-download"></i>
                                         Download Report
                                     </a>
@@ -168,9 +172,9 @@
                                 {{-- Download Report --}}
 
                                 {{-- Extend Time --}}
-                                @can('update', $assessment_event)
+                                @can('update', $assessmentEvent)
                                     <a class="btn btn-outline-info btn-sm mb-2"
-                                        href="{{ route('assessment_events.extend_time.create', ['assessment_event' => $assessment_event]) }}">
+                                        href="{{ route('assessment_events.extend_time.create', ['assessment_event' => $assessmentEvent]) }}">
                                         <i class="fas fa-external-link-square-alt"></i>
                                         Extend Time
                                     </a>
@@ -178,14 +182,14 @@
                                 {{-- Extend Time --}}
 
                                 {{-- EDIT & DELETE --}}
-                                @can('delete', $assessment_event)
+                                @can('delete', $assessmentEvent)
                                     <a class="btn btn-outline-info btn-sm mb-2"
-                                        href="{{ route('assessment_events.edit', ['assessment_event' => $assessment_event]) }}">
+                                        href="{{ route('assessment_events.edit', ['assessment_event' => $assessmentEvent]) }}">
                                         <i class="fas fa-edit"></i>
                                         EDIT
                                     </a>
                                     <form method="POST"
-                                        action="{{ route('assessment_events.destroy', ['assessment_event' => $assessment_event]) }}"
+                                        action="{{ route('assessment_events.destroy', ['assessment_event' => $assessmentEvent]) }}"
                                         onsubmit="return confirm('Are you sure you want to remove the item?')">
                                         @csrf
                                         @method('DELETE')
@@ -201,6 +205,19 @@
 
         </div>
         <!--/card body-->
+
+        @if ($assessmentEvents->hasPages())
+            <div class="card-footer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        Showing {{ $assessmentEvents->firstItem() }} to {{ $assessmentEvents->lastItem() }} of {{ $assessmentEvents->total() }} entries
+                    </div>
+                    <div>
+                        {{ $assessmentEvents->links() }}
+                    </div>
+                </div>
+            </div>
+        @endif
 
     </div>
 @endsection

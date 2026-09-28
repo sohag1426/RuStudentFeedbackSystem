@@ -42,9 +42,13 @@ class AssessmentEventController extends Controller
             $filter['course_id'] = $request->course_id;
         }
 
-        $assessment_events = AssessmentEvent::with(['teacher', 'course', 'group'])
+        $perPage = (int) $request->input('per_page', 20);
+
+        $assessmentEvents = AssessmentEvent::with(['teacher', 'course', 'group'])
             ->where($filter)
-            ->get();
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
 
         $users = User::where('department_id', $request->user()->department_id)
             ->where(function ($query) {
@@ -55,7 +59,8 @@ class AssessmentEventController extends Controller
         $courses = Course::where('department_id', $request->user()->department_id)->get();
 
         return view('teacher.assessment_events', [
-            'assessment_events' => $assessment_events,
+            'assessmentEvents' => $assessmentEvents,
+            'assessment_events' => $assessmentEvents,
             'users' => $users,
             'courses' => $courses,
         ]);
@@ -130,44 +135,44 @@ class AssessmentEventController extends Controller
 
         $now = Carbon::now('Asia/Dhaka')->setHour(0)->setMinute(0);
 
-        $start_date = date_format(date_create($request->start_date), config('datetimeformat.date_format'));
-        $stop_date = date_format(date_create($request->stop_date), config('datetimeformat.date_format'));
+        $startDate = date_format(date_create($request->start_date), config('datetimeformat.date_format'));
+        $stopDate = date_format(date_create($request->stop_date), config('datetimeformat.date_format'));
 
-        $start_time = Carbon::createFromFormat(config('datetimeformat.date_format'), $start_date);
-        $start_time->setHour($request->start_hour)->setMinute($request->start_minute);
-        if ($start_time->lessThan($now)) {
+        $startTime = Carbon::createFromFormat(config('datetimeformat.date_format'), $startDate);
+        $startTime->setHour($request->start_hour)->setMinute($request->start_minute);
+        if ($startTime->lessThan($now)) {
             return redirect()->route('assessment_events.create')->with('info', 'Backdated events are not possible to create.');
         }
 
-        $stop_time = Carbon::createFromFormat(config('datetimeformat.date_format'), $stop_date);
-        $stop_time->setHour($request->stop_hour)->setMinute($request->stop_minute);
-        if ($stop_time->lessThan($start_time)) {
+        $stopTime = Carbon::createFromFormat(config('datetimeformat.date_format'), $stopDate);
+        $stopTime->setHour($request->stop_hour)->setMinute($request->stop_minute);
+        if ($stopTime->lessThan($startTime)) {
             return redirect()->route('assessment_events.create')->with('info', 'It is not possible to stop before the start time.');
         }
 
-        $assessment_event = new AssessmentEvent;
-        $assessment_event->user_id = $request->user()->id;
-        $assessment_event->department_id = $request->user()->department_id;
-        $assessment_event->teacher_id = $request->teacher_id;
-        $assessment_event->course_id = $request->course_id;
-        $assessment_event->group_id = $request->group_id;
-        $assessment_event->session = $group->session;
-        $assessment_event->year = $group->year;
-        $assessment_event->semester = $group->semester;
-        $assessment_event->start_time = $start_time;
-        $assessment_event->stop_time = $stop_time;
-        $assessment_event->save();
+        $assessmentEvent = new AssessmentEvent;
+        $assessmentEvent->user_id = $request->user()->id;
+        $assessmentEvent->department_id = $request->user()->department_id;
+        $assessmentEvent->teacher_id = $request->teacher_id;
+        $assessmentEvent->course_id = $request->course_id;
+        $assessmentEvent->group_id = $request->group_id;
+        $assessmentEvent->session = $group->session;
+        $assessmentEvent->year = $group->year;
+        $assessmentEvent->semester = $group->semester;
+        $assessmentEvent->start_time = $startTime;
+        $assessmentEvent->stop_time = $stopTime;
+        $assessmentEvent->save();
 
         // assessment_event_students
-        $student_group_members = StudentGroupMember::where('group_id', $assessment_event->group_id)->get();
-        foreach ($student_group_members as $student) {
-            $assessment_event_student = new AssessmentEventStudent;
-            $assessment_event_student->event_id = $assessment_event->id;
-            $assessment_event_student->department_id = $student->department_id;
-            $assessment_event_student->group_id = $student->group_id;
-            $assessment_event_student->student_id = $student->student_id;
-            $assessment_event_student->name = $student->name;
-            $assessment_event_student->save();
+        $studentGroupMembers = StudentGroupMember::where('group_id', $assessmentEvent->group_id)->get();
+        foreach ($studentGroupMembers as $student) {
+            $assessmentEventStudent = new AssessmentEventStudent;
+            $assessmentEventStudent->event_id = $assessmentEvent->id;
+            $assessmentEventStudent->department_id = $student->department_id;
+            $assessmentEventStudent->group_id = $student->group_id;
+            $assessmentEventStudent->student_id = $student->student_id;
+            $assessmentEventStudent->name = $student->name;
+            $assessmentEventStudent->save();
         }
 
         return redirect()->route('assessment_events.index');
@@ -178,10 +183,11 @@ class AssessmentEventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function edit(AssessmentEvent $assessment_event)
+    public function edit(AssessmentEvent $assessmentEvent)
     {
         return view('teacher.assessment_events_edit', [
-            'assessment_event' => $assessment_event,
+            'assessmentEvent' => $assessmentEvent,
+            'assessment_event' => $assessmentEvent,
         ]);
     }
 
@@ -190,7 +196,7 @@ class AssessmentEventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, AssessmentEvent $assessment_event)
+    public function update(Request $request, AssessmentEvent $assessmentEvent)
     {
         $request->validate([
             'start_date' => 'required|string',
@@ -203,24 +209,24 @@ class AssessmentEventController extends Controller
 
         $now = Carbon::now('Asia/Dhaka')->setHour(0)->setMinute(0);
 
-        $start_date = date_format(date_create($request->start_date), config('datetimeformat.date_format'));
-        $stop_date = date_format(date_create($request->stop_date), config('datetimeformat.date_format'));
+        $startDate = date_format(date_create($request->start_date), config('datetimeformat.date_format'));
+        $stopDate = date_format(date_create($request->stop_date), config('datetimeformat.date_format'));
 
-        $start_time = Carbon::createFromFormat(config('datetimeformat.date_format'), $start_date);
-        $start_time->setHour($request->start_hour)->setMinute($request->start_minute);
-        if ($start_time->lessThan($now)) {
-            return redirect()->route('assessment_events.edit', ['assessment_event' => $assessment_event])->with('info', 'Backdated events are not possible to create.');
+        $startTime = Carbon::createFromFormat(config('datetimeformat.date_format'), $startDate);
+        $startTime->setHour($request->start_hour)->setMinute($request->start_minute);
+        if ($startTime->lessThan($now)) {
+            return redirect()->route('assessment_events.edit', ['assessment_event' => $assessmentEvent])->with('info', 'Backdated events are not possible to create.');
         }
 
-        $stop_time = Carbon::createFromFormat(config('datetimeformat.date_format'), $stop_date);
-        $stop_time->setHour($request->stop_hour)->setMinute($request->stop_minute);
-        if ($stop_time->lessThan($start_time)) {
-            return redirect()->route('assessment_events.edit', ['assessment_event' => $assessment_event])->with('info', 'It is not possible to stop before the start time.');
+        $stopTime = Carbon::createFromFormat(config('datetimeformat.date_format'), $stopDate);
+        $stopTime->setHour($request->stop_hour)->setMinute($request->stop_minute);
+        if ($stopTime->lessThan($startTime)) {
+            return redirect()->route('assessment_events.edit', ['assessment_event' => $assessmentEvent])->with('info', 'It is not possible to stop before the start time.');
         }
 
-        $assessment_event->start_time = $start_time;
-        $assessment_event->stop_time = $stop_time;
-        $assessment_event->save();
+        $assessmentEvent->start_time = $startTime;
+        $assessmentEvent->stop_time = $stopTime;
+        $assessmentEvent->save();
 
         return redirect()->route('assessment_events.index');
     }
@@ -230,10 +236,10 @@ class AssessmentEventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroy(AssessmentEvent $assessment_event)
+    public function destroy(AssessmentEvent $assessmentEvent)
     {
-        $this->authorize('delete', $assessment_event);
-        $assessment_event->delete();
+        $this->authorize('delete', $assessmentEvent);
+        $assessmentEvent->delete();
 
         return redirect()->route('assessment_events.index');
     }
@@ -243,21 +249,21 @@ class AssessmentEventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public static function getFeedbackEvents(AssessmentEventStudent $assessment_event_student): Collection
+    public static function getFeedbackEvents(AssessmentEventStudent $assessmentEventStudent): Collection
     {
-        $event_ids = AssessmentEventStudent::where('student_id', $assessment_event_student->student_id)->get()
+        $eventIds = AssessmentEventStudent::where('student_id', $assessmentEventStudent->student_id)->get()
             ->pluck('event_id')
             ->unique();
 
-        $assessment_events = AssessmentEvent::whereIn('id', $event_ids)
+        $assessmentEvents = AssessmentEvent::whereIn('id', $eventIds)
             ->get();
 
-        $notYetSubmittedEvents = $assessment_events->filter(function (AssessmentEvent $value, int $key) use ($assessment_event_student) {
-            return ($value->stop_time >= Carbon::now()->format(config('datetimeformat.date_time_format'))) && (AssessmentStatus::where('event_id', $value->id)->where('student_id', $assessment_event_student->student_id)->count() == 0);
+        $notYetSubmittedEvents = $assessmentEvents->filter(function (AssessmentEvent $value, int $key) use ($assessmentEventStudent) {
+            return ($value->stop_time >= Carbon::now()->format(config('datetimeformat.date_time_format'))) && (AssessmentStatus::where('event_id', $value->id)->where('student_id', $assessmentEventStudent->student_id)->count() == 0);
         });
 
-        $submittedEvents = $assessment_events->filter(function (AssessmentEvent $value, int $key) use ($assessment_event_student) {
-            return AssessmentStatus::where('event_id', $value->id)->where('student_id', $assessment_event_student->student_id)->count();
+        $submittedEvents = $assessmentEvents->filter(function (AssessmentEvent $value, int $key) use ($assessmentEventStudent) {
+            return AssessmentStatus::where('event_id', $value->id)->where('student_id', $assessmentEventStudent->student_id)->count();
         });
 
         return collect(['submitted' => $submittedEvents, 'notYetSubmitted' => $notYetSubmittedEvents]);
