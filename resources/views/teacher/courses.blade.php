@@ -42,7 +42,9 @@
                         <th scope="col">#</th>
                         <th scope="col">Course Code</th>
                         <th scope="col">Course Name</th>
-                        <th scope="col"></th>
+                        <th scope="col">Year</th>
+                        <th scope="col">Semester</th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,6 +53,8 @@
                             <td scope="row">{{ $course->id }}</td>
                             <td>{{ $course->code }}</td>
                             <td>{{ $course->name }}</td>
+                            <td>{{ $course->year?->value ?? $course->year ?? '-' }}</td>
+                            <td>{{ $course->semester?->value ?? $course->semester ?? '-' }}</td>
                             <td>
                                 {{-- Edit --}}
                                 @can('update', $course)

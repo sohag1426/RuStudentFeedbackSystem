@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Semester;
+use App\Enums\Year;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,6 +26,16 @@ class Course extends Model
      * @var array<string>|bool
      */
     protected $guarded = [];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'year' => Year::class,
+        'semester' => Semester::class,
+    ];
 
     /**
      * Get the department.

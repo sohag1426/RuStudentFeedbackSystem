@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Semester;
+use App\Enums\Year;
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Enum;
 
 class CourseController extends Controller
 {
@@ -28,21 +31,24 @@ class CourseController extends Controller
      */
     public function create()
     {
-        return view('teacher.courses-create');
+        return view('teacher.courses-create', [
+            'years' => Year::cases(),
+            'semesters' => Semester::cases(),
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-
         $request->validate([
             'code' => 'required|string',
             'name' => 'required|string',
+            'year' => ['required', new Enum(Year::class)],
+            'semester' => ['required', new Enum(Semester::class)],
         ]);
 
         if (Course::where('department_id', $request->user()->department_id)->where('code', $request->code)->count()) {
@@ -53,11 +59,13 @@ class CourseController extends Controller
             return redirect()->route('courses.index')->with('info', 'Duplicate Course Name');
         }
 
-        $course = new Course();
+        $course = new Course;
         $course->user_id = $request->user()->id;
         $course->department_id = $request->user()->department_id;
         $course->code = $request->code;
         $course->name = $request->name;
+        $course->year = $request->year;
+        $course->semester = $request->semester;
         $course->save();
 
         return redirect()->route('courses.index');
@@ -66,21 +74,20 @@ class CourseController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Course  $course
      * @return \Illuminate\Http\Response
      */
     public function edit(Course $course)
     {
         return view('teacher.courses-edit', [
             'course' => $course,
+            'years' => Year::cases(),
+            'semesters' => Semester::cases(),
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Course  $course
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Course $course)
@@ -88,6 +95,8 @@ class CourseController extends Controller
         $request->validate([
             'code' => 'required|string',
             'name' => 'required|string',
+            'year' => ['required', new Enum(Year::class)],
+            'semester' => ['required', new Enum(Semester::class)],
         ]);
 
         if ($request->code != $course->code) {
@@ -104,6 +113,8 @@ class CourseController extends Controller
 
         $course->code = $request->code;
         $course->name = $request->name;
+        $course->year = $request->year;
+        $course->semester = $request->semester;
         $course->save();
 
         return redirect()->route('courses.index');
