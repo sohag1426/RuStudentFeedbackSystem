@@ -199,6 +199,16 @@ class AssessmentEvent extends Model
     }
 
     /**
+     * Get the stop_time attribute in human-readable format (e.g. 01 Sep 2026).
+     */
+    public function stopTime(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Carbon::parse($value)->format('d M Y') : null,
+        );
+    }
+
+    /**
      * Scope a query to only include running assessment events.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query

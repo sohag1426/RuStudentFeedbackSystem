@@ -109,7 +109,7 @@ class AssessmentEventPolicy
         }
 
         $now = Carbon::now();
-        $extendTime = Carbon::parse($assessmentEvent->stop_time)->addDays(config('app.event_extend_limit', 30));
+        $extendTime = Carbon::parse($assessmentEvent->getRawOriginal('stop_time') ?? $assessmentEvent->stop_time)->addDays(config('app.event_extend_limit', 30));
         if ($now->lessThan($extendTime)) {
             return true;
         }

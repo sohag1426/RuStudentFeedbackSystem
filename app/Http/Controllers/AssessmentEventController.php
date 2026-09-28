@@ -259,7 +259,9 @@ class AssessmentEventController extends Controller
             ->get();
 
         $notYetSubmittedEvents = $assessmentEvents->filter(function (AssessmentEvent $value, int $key) use ($assessmentEventStudent) {
-            return ($value->stop_time >= Carbon::now()->format(config('datetimeformat.date_time_format'))) && (AssessmentStatus::where('event_id', $value->id)->where('student_id', $assessmentEventStudent->student_id)->count() == 0);
+            $stopTime = $value->getRawOriginal('stop_time') ?? $value->stop_time;
+
+            return ($stopTime >= Carbon::now()->format(config('datetimeformat.date_time_format'))) && (AssessmentStatus::where('event_id', $value->id)->where('student_id', $assessmentEventStudent->student_id)->count() == 0);
         });
 
         $submittedEvents = $assessmentEvents->filter(function (AssessmentEvent $value, int $key) use ($assessmentEventStudent) {

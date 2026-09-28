@@ -380,8 +380,8 @@ class AssessmentEventTest extends TestCase
         // Time is updated
         $this->assertEquals(11, Carbon::parse($event->getRawOriginal('start_time'))->hour);
         $this->assertEquals(30, Carbon::parse($event->getRawOriginal('start_time'))->minute);
-        $this->assertEquals(16, Carbon::parse($event->stop_time)->hour);
-        $this->assertEquals(45, Carbon::parse($event->stop_time)->minute);
+        $this->assertEquals(16, Carbon::parse($event->getRawOriginal('stop_time'))->hour);
+        $this->assertEquals(45, Carbon::parse($event->getRawOriginal('stop_time'))->minute);
 
         // Teacher, course, group, session, year, semester remain untouched
         $this->assertEquals($this->teacher->id, $event->teacher_id);
