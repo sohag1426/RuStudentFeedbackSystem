@@ -37,6 +37,15 @@ class StudentGroup extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'display_name',
+    ];
+
+    /**
      * The attributes that should be cast.
      *
      * @var array<string, string>

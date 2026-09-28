@@ -458,4 +458,83 @@ class AssessmentEventTest extends TestCase
         $this->assertEquals('1st Semester', $event->semester->value);
         $this->assertEquals($this->group->id, $event->group_id);
     }
+
+    public function test_create_view_provides_courses_and_groups_data_for_alpine_filtering()
+    {
+        $response = $this->actingAs($this->teacher)->get(route('assessment_events.create'));
+        $response->assertStatus(200);
+        $response->assertViewHas('coursesData');
+        $response->assertViewHas('groupsData');
+        $response->assertSee('assessmentEventForm()', false);
+    }
+
+    public function test_cannot_create_event_if_course_and_group_year_or_semester_mismatch()
+    {
+        $mismatchedCourse = Course::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'code' => 'CSE201',
+            'name' => 'Algorithms',
+            'year' => '2nd Year',
+            'semester' => '1st Semester',
+        ]);
+
+        $today = Carbon::now('Asia/Dhaka')->format(config('datetimeformat.date_format'));
+        $tomorrow = Carbon::now('Asia/Dhaka')->addDays(2)->format(config('datetimeformat.date_format'));
+
+        // $this->group is 1st Year, 1st Semester; $mismatchedCourse is 2nd Year, 1st Semester
+        $response = $this->actingAs($this->teacher)->post(route('assessment_events.store'), [
+            'teacher_id' => $this->teacher->id,
+            'course_id' => $mismatchedCourse->id,
+            'group_id' => $this->group->id,
+            'start_date' => $today,
+            'start_hour' => 10,
+            'start_minute' => 0,
+            'stop_date' => $tomorrow,
+            'stop_hour' => 17,
+            'stop_minute' => 0,
+        ]);
+
+        $response->assertRedirect(route('assessment_events.create'));
+        $response->assertSessionHasErrors('group_id');
+        $this->assertDatabaseMissing('assessment_events', [
+            'course_id' => $mismatchedCourse->id,
+            'group_id' => $this->group->id,
+        ]);
+    }
+
+    public function test_can_create_event_when_course_and_group_year_and_semester_match()
+    {
+        $matchingCourse = Course::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'code' => 'CSE102',
+            'name' => 'Discrete Math',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
+        ]);
+
+        $today = Carbon::now('Asia/Dhaka')->format(config('datetimeformat.date_format'));
+        $tomorrow = Carbon::now('Asia/Dhaka')->addDays(2)->format(config('datetimeformat.date_format'));
+
+        $response = $this->actingAs($this->teacher)->post(route('assessment_events.store'), [
+            'teacher_id' => $this->teacher->id,
+            'course_id' => $matchingCourse->id,
+            'group_id' => $this->group->id,
+            'start_date' => $today,
+            'start_hour' => 10,
+            'start_minute' => 0,
+            'stop_date' => $tomorrow,
+            'stop_hour' => 17,
+            'stop_minute' => 0,
+        ]);
+
+        $response->assertRedirect(route('assessment_events.index'));
+        $this->assertDatabaseHas('assessment_events', [
+            'course_id' => $matchingCourse->id,
+            'group_id' => $this->group->id,
+            'year' => '1st Year',
+            'semester' => '1st Semester',
+        ]);
+    }
 }
