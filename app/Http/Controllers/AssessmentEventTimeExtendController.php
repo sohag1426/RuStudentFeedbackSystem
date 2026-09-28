@@ -14,6 +14,7 @@ class AssessmentEventTimeExtendController extends Controller
     public function create(AssessmentEvent $assessment_event)
     {
         $this->authorize('update', [$assessment_event]);
+
         return view('teacher.assessment_event_extend', [
             'assessment_event' => $assessment_event,
         ]);
@@ -36,7 +37,7 @@ class AssessmentEventTimeExtendController extends Controller
         $stop_time = Carbon::createFromFormat(config('datetimeformat.date_format'), $stop_date);
         $stop_time->setHour($request->stop_hour)->setMinute($request->stop_minute);
 
-        $start_time = Carbon::parse($assessment_event->start_time);
+        $start_time = Carbon::parse($assessment_event->getRawOriginal('start_time') ?? $assessment_event->start_time);
         $now = Carbon::now('Asia/Dhaka');
 
         if ($stop_time->lessThanOrEqualTo($start_time)) {

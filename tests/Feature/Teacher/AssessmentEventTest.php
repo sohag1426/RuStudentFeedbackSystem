@@ -3,7 +3,6 @@
 namespace Tests\Feature\Teacher;
 
 use App\Models\AssessmentEvent;
-use App\Models\AssessmentEventStudent;
 use App\Models\Course;
 use App\Models\Department;
 use App\Models\StudentGroup;
@@ -18,8 +17,11 @@ class AssessmentEventTest extends TestCase
     use RefreshDatabase;
 
     protected $department;
+
     protected $teacher;
+
     protected $course;
+
     protected $group;
 
     protected function setUp(): void
@@ -376,8 +378,8 @@ class AssessmentEventTest extends TestCase
         $event->refresh();
 
         // Time is updated
-        $this->assertEquals(11, Carbon::parse($event->start_time)->hour);
-        $this->assertEquals(30, Carbon::parse($event->start_time)->minute);
+        $this->assertEquals(11, Carbon::parse($event->getRawOriginal('start_time'))->hour);
+        $this->assertEquals(30, Carbon::parse($event->getRawOriginal('start_time'))->minute);
         $this->assertEquals(16, Carbon::parse($event->stop_time)->hour);
         $this->assertEquals(45, Carbon::parse($event->stop_time)->minute);
 

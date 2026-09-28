@@ -21,8 +21,8 @@ class AssessmentController extends Controller
      */
     private function validateStudentSession(Request $request, AssessmentEventStudent $assessment_event_student): bool
     {
-        $sessionToken = $request->session()->get('student_auth_token_' . $assessment_event_student->id);
-        $cachedToken = Cache::get('student_token_' . $assessment_event_student->id);
+        $sessionToken = $request->session()->get('student_auth_token_'.$assessment_event_student->id);
+        $cachedToken = Cache::get('student_token_'.$assessment_event_student->id);
 
         if (! $sessionToken || ! $cachedToken || ! hash_equals((string) $cachedToken, (string) $sessionToken)) {
             return false;
@@ -34,8 +34,6 @@ class AssessmentController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\AssessmentEventStudent  $assessment_event_student
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, AssessmentEventStudent $assessment_event_student)
@@ -52,9 +50,6 @@ class AssessmentController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\AssessmentEventStudent  $assessment_event_student
-     * @param  \App\Models\AssessmentEvent  $assessment_event
      * @return \Illuminate\Http\Response
      */
     public function edit(Request $request, AssessmentEventStudent $assessment_event_student, AssessmentEvent $assessment_event)
@@ -67,9 +62,9 @@ class AssessmentController extends Controller
             return redirect()->route('assessment_event_students.assessment_events.index', ['assessment_event_student' => $assessment_event_student])->with('info', 'Feedback was already completed!');
         }
 
-        $startTime = Carbon::parse($assessment_event->start_time);
+        $startTime = Carbon::parse($assessment_event->getRawOriginal('start_time') ?? $assessment_event->start_time);
         if (Carbon::now()->lessThan($startTime)) {
-            return redirect()->route('assessment_event_students.assessment_events.index', ['assessment_event_student' => $assessment_event_student])->with('info', 'Please wait until ' . $assessment_event->start_time);
+            return redirect()->route('assessment_event_students.assessment_events.index', ['assessment_event_student' => $assessment_event_student])->with('info', 'Please wait until '.$assessment_event->start_time);
         }
 
         $highest_score = config('app.highest_score', 5);
@@ -89,9 +84,6 @@ class AssessmentController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\AssessmentEventStudent  $assessment_event_student
-     * @param  \App\Models\AssessmentEvent  $assessment_event
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, AssessmentEventStudent $assessment_event_student, AssessmentEvent $assessment_event)
@@ -113,7 +105,7 @@ class AssessmentController extends Controller
                 if ($request->filled($question_id)) {
                     $scoreVal = (int) $request->input($question_id);
                     if ($scoreVal >= 1 && $scoreVal <= $highest_score) {
-                        $assessment = new Assessment();
+                        $assessment = new Assessment;
                         $assessment->department_id = $assessment_event->department_id;
                         $assessment->event_id = $assessment_event->id;
                         $assessment->question_id = $question->id;
@@ -124,14 +116,14 @@ class AssessmentController extends Controller
             }
 
             if ($request->filled('comment')) {
-                $comment = new Comment();
+                $comment = new Comment;
                 $comment->department_id = $assessment_event->department_id;
                 $comment->event_id = $assessment_event->id;
                 $comment->comment = (string) $request->input('comment');
                 $comment->save();
             }
 
-            $assessment_status = new AssessmentStatus();
+            $assessment_status = new AssessmentStatus;
             $assessment_status->department_id = $assessment_event->department_id;
             $assessment_status->event_id = $assessment_event->id;
             $assessment_status->student_id = $assessment_event_student->student_id;
