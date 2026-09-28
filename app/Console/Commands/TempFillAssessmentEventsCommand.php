@@ -17,6 +17,7 @@ class TempFillAssessmentEventsCommand extends Command
                             {--session=2024-2025 : The session of the student groups (default: 2024-2025)}
                             {--year=1st Year : The assessment event year to fill (default: 1st Year)}
                             {--semester=1st Semester : The assessment event semester to fill (default: 1st Semester)}
+                            {--force : Overwrite existing non-null values as well}
                             {--dry-run : Simulate the fill without saving changes}';
 
     /**
@@ -34,7 +35,7 @@ class TempFillAssessmentEventsCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Temp command to fill session, year, and semester on assessment_events for student groups of session 2024-2025';
+    protected $description = 'Temp command to fill null session, year, and semester values on assessment_events for student groups of session 2024-2025';
 
     /**
      * Execute the console command.
@@ -44,6 +45,7 @@ class TempFillAssessmentEventsCommand extends Command
         $session = (string) $this->option('session');
         $year = (string) $this->option('year');
         $semester = (string) $this->option('semester');
+        $force = (bool) $this->option('force');
         $dryRun = (bool) $this->option('dry-run');
 
         $this->info("Looking up StudentGroups with session '{$session}'...");
@@ -68,18 +70,31 @@ class TempFillAssessmentEventsCommand extends Command
         $this->info("Found {$groups->count()} StudentGroup(s): IDs [{$groupIds->implode(', ')}]");
 
         $eventsQuery = AssessmentEvent::whereIn('group_id', $groupIds);
-        $totalEvents = $eventsQuery->count();
+
+        if (! $force) {
+            $eventsQuery->where(function ($query) {
+                $query->whereNull('session')
+                    ->orWhere('session', '')
+                    ->orWhereNull('year')
+                    ->orWhere('year', '')
+                    ->orWhereNull('semester')
+                    ->orWhere('semester', '');
+            });
+        }
+
+        $eventsToProcess = $eventsQuery->get();
+        $totalEvents = $eventsToProcess->count();
 
         if ($totalEvents === 0) {
-            $this->warn('No assessment events found linked to the matching StudentGroup(s).');
+            $this->info('No assessment events with null values found linked to the matching StudentGroup(s).');
 
             return Command::SUCCESS;
         }
 
-        $this->info("Found {$totalEvents} assessment event(s) to update.");
+        $this->info("Found {$totalEvents} assessment event(s) with null value(s) to fill.");
 
         if ($dryRun) {
-            $this->info("[DRY RUN] Would update {$totalEvents} assessment event(s) with:");
+            $this->info("[DRY RUN] Would fill null fields in {$totalEvents} assessment event(s) with:");
             $this->line("  session:  {$session}");
             $this->line("  year:     {$year}");
             $this->line("  semester: {$semester}");
@@ -87,18 +102,35 @@ class TempFillAssessmentEventsCommand extends Command
             return Command::SUCCESS;
         }
 
-        $updatedCount = AssessmentEvent::whereIn('group_id', $groupIds)->update([
-            'session' => $session,
-            'year' => $year,
-            'semester' => $semester,
-        ]);
+        $eventIds = $eventsToProcess->pluck('id');
 
-        $this->info("Successfully updated {$updatedCount} assessment event(s):");
-        $this->line("  - session  => '{$session}'");
-        $this->line("  - year     => '{$year}'");
-        $this->line("  - semester => '{$semester}'");
+        if ($force) {
+            $updatedCount = AssessmentEvent::whereIn('id', $eventIds)->update([
+                'session' => $session,
+                'year' => $year,
+                'semester' => $semester,
+            ]);
+            $this->info("Force updated {$updatedCount} assessment event(s).");
+        } else {
+            $sessionUpdated = AssessmentEvent::whereIn('id', $eventIds)
+                ->where(fn ($q) => $q->whereNull('session')->orWhere('session', ''))
+                ->update(['session' => $session]);
 
-        $events = AssessmentEvent::whereIn('group_id', $groupIds)
+            $yearUpdated = AssessmentEvent::whereIn('id', $eventIds)
+                ->where(fn ($q) => $q->whereNull('year')->orWhere('year', ''))
+                ->update(['year' => $year]);
+
+            $semesterUpdated = AssessmentEvent::whereIn('id', $eventIds)
+                ->where(fn ($q) => $q->whereNull('semester')->orWhere('semester', ''))
+                ->update(['semester' => $semester]);
+
+            $this->info('Successfully filled assessment events with null values:');
+            $this->line("  - session  ('{$session}'): {$sessionUpdated} event(s) filled");
+            $this->line("  - year     ('{$year}'): {$yearUpdated} event(s) filled");
+            $this->line("  - semester ('{$semester}'): {$semesterUpdated} event(s) filled");
+        }
+
+        $events = AssessmentEvent::whereIn('id', $eventIds)
             ->with(['teacher', 'course', 'group'])
             ->get();
 
