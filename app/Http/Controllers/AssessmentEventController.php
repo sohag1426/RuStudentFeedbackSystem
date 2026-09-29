@@ -81,18 +81,32 @@ class AssessmentEventController extends Controller
                     ->orWhere('role', 'teacher');
             })->get();
 
-        $courses = Course::where('department_id', $request->user()->department_id)->get();
+        $courses = Course::where('department_id', $request->user()->department_id)
+            ->eligibleForAssessment()
+            ->get();
         $groups = StudentGroup::where('department_id', $request->user()->department_id)
             ->eligibleForAssessment()
             ->get();
 
         $coursesData = $courses->map(function (Course $course) {
+            try {
+                $year = $course->year;
+            } catch (\ValueError) {
+                $year = null;
+            }
+
+            try {
+                $semester = $course->semester;
+            } catch (\ValueError) {
+                $semester = null;
+            }
+
             return [
                 'id' => $course->id,
                 'name' => $course->name,
                 'code' => $course->code,
-                'year' => $course->year instanceof Year ? $course->year->value : (string) ($course->year?->value ?? $course->year ?? ''),
-                'semester' => $course->semester instanceof Semester ? $course->semester->value : (string) ($course->semester?->value ?? $course->semester ?? ''),
+                'year' => $year instanceof Year ? $year->value : (string) ($year?->value ?? $year ?? ''),
+                'semester' => $semester instanceof Semester ? $semester->value : (string) ($semester?->value ?? $semester ?? ''),
             ];
         });
 
@@ -101,8 +115,6 @@ class AssessmentEventController extends Controller
                 'id' => $group->id,
                 'name' => $group->name,
                 'session' => $group->session,
-                'year' => $group->year instanceof Year ? $group->year->value : (string) ($group->year?->value ?? $group->year ?? ''),
-                'semester' => $group->semester instanceof Semester ? $group->semester->value : (string) ($group->semester?->value ?? $group->semester ?? ''),
                 'display_name' => $group->display_name,
             ];
         });
@@ -125,7 +137,19 @@ class AssessmentEventController extends Controller
     {
         $request->validate([
             'teacher_id' => ['required', 'numeric'],
-            'course_id' => ['required', 'numeric'],
+            'course_id' => [
+                'required',
+                'numeric',
+                function ($attribute, $value, $fail) use ($request) {
+                    $course = Course::where('id', $value)
+                        ->where('department_id', $request->user()->department_id)
+                        ->first();
+
+                    if (! $course || ! $course->isEligibleForAssessment()) {
+                        $fail('The selected course is missing year or semester. Please update the course first.');
+                    }
+                },
+            ],
             'group_id' => [
                 'required',
                 'numeric',
@@ -135,7 +159,7 @@ class AssessmentEventController extends Controller
                         ->first();
 
                     if (! $group || ! $group->isEligibleForAssessment()) {
-                        $fail('The selected student group is invalid or not eligible for assessment. A valid session, year, semester, and at least one student are required.');
+                        $fail('The selected student group is invalid or not eligible for assessment. A valid session and at least one student are required.');
                     }
                 },
             ],
@@ -155,26 +179,22 @@ class AssessmentEventController extends Controller
             return redirect()->route('assessment_events.create')
                 ->withInput()
                 ->with('info', 'The selected student group is invalid or has no students.')
-                ->withErrors(['group_id' => 'The selected student group is invalid or not eligible for assessment. A valid session, year, semester, and at least one student are required.']);
+                ->withErrors(['group_id' => 'The selected student group is invalid or not eligible for assessment. A valid session and at least one student are required.']);
         }
 
         $course = Course::where('id', $request->course_id)
             ->where('department_id', $request->user()->department_id)
             ->first();
 
-        if ($course && $course->year && $course->semester) {
-            $courseYearVal = $course->year instanceof Year ? $course->year->value : $course->year;
-            $courseSemVal = $course->semester instanceof Semester ? $course->semester->value : $course->semester;
-            $groupYearVal = $group->year instanceof Year ? $group->year->value : $group->year;
-            $groupSemVal = $group->semester instanceof Semester ? $group->semester->value : $group->semester;
-
-            if ($courseYearVal !== $groupYearVal || $courseSemVal !== $groupSemVal) {
-                return redirect()->route('assessment_events.create')
-                    ->withInput()
-                    ->with('info', 'The selected course and student group must belong to the same year and semester.')
-                    ->withErrors(['group_id' => 'The selected student group does not match the course\'s year and semester.']);
-            }
+        if (! $course || ! $course->isEligibleForAssessment()) {
+            return redirect()->route('assessment_events.create')
+                ->withInput()
+                ->with('info', 'The selected course is missing year or semester. Please update the course first.')
+                ->withErrors(['course_id' => 'The selected course is missing year or semester. Please update the course first.']);
         }
+
+        $courseYearVal = $course->year instanceof Year ? $course->year->value : $course->year;
+        $courseSemVal = $course->semester instanceof Semester ? $course->semester->value : $course->semester;
 
         $now = Carbon::now('Asia/Dhaka')->setHour(0)->setMinute(0);
 
@@ -200,8 +220,8 @@ class AssessmentEventController extends Controller
         $assessmentEvent->course_id = $request->course_id;
         $assessmentEvent->group_id = $request->group_id;
         $assessmentEvent->session = $group->session;
-        $assessmentEvent->year = $group->year;
-        $assessmentEvent->semester = $group->semester;
+        $assessmentEvent->year = $courseYearVal;
+        $assessmentEvent->semester = $courseSemVal;
         $assessmentEvent->start_time = $startTime;
         $assessmentEvent->stop_time = $stopTime;
         $assessmentEvent->save();

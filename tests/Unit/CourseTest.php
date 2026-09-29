@@ -41,4 +41,35 @@ class CourseTest extends TestCase
         $this->assertNull($course->year);
         $this->assertNull($course->semester);
     }
+
+    public function test_is_eligible_for_assessment()
+    {
+        $eligibleCourse = new Course;
+        $eligibleCourse->setRawAttributes([
+            'year' => '1st Year',
+            'semester' => '1st Semester',
+        ], true);
+        $this->assertTrue($eligibleCourse->isEligibleForAssessment());
+
+        $noYearCourse = new Course;
+        $noYearCourse->setRawAttributes([
+            'year' => null,
+            'semester' => '1st Semester',
+        ], true);
+        $this->assertFalse($noYearCourse->isEligibleForAssessment());
+
+        $noSemesterCourse = new Course;
+        $noSemesterCourse->setRawAttributes([
+            'year' => '1st Year',
+            'semester' => null,
+        ], true);
+        $this->assertFalse($noSemesterCourse->isEligibleForAssessment());
+
+        $emptyCourse = new Course;
+        $emptyCourse->setRawAttributes([
+            'year' => '',
+            'semester' => '',
+        ], true);
+        $this->assertFalse($emptyCourse->isEligibleForAssessment());
+    }
 }

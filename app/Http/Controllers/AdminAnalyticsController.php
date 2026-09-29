@@ -72,7 +72,7 @@ class AdminAnalyticsController extends Controller
         $pdf = Pdf::loadView('admin.analytics.pdf', compact('events', 'filters'))
             ->setPaper('a4', 'landscape');
 
-        return $pdf->download('analytics-report-' . date('Y-m-d') . '.pdf');
+        return $pdf->download('analytics-report-'.date('Y-m-d').'.pdf');
     }
 
     /**
@@ -102,7 +102,7 @@ class AdminAnalyticsController extends Controller
                 $q->where('year', $request->year)
                     ->orWhere(function ($q2) use ($request) {
                         $q2->whereNull('year')
-                            ->whereHas('group', fn ($g) => $g->where('year', $request->year));
+                            ->whereHas('course', fn ($c) => $c->where('year', $request->year));
                     });
             });
         }
@@ -112,7 +112,7 @@ class AdminAnalyticsController extends Controller
                 $q->where('semester', $request->semester)
                     ->orWhere(function ($q2) use ($request) {
                         $q2->whereNull('semester')
-                            ->whereHas('group', fn ($g) => $g->where('semester', $request->semester));
+                            ->whereHas('course', fn ($c) => $c->where('semester', $request->semester));
                     });
             });
         }
@@ -128,7 +128,7 @@ class AdminAnalyticsController extends Controller
         if ($request->filled('score')) {
             $op = in_array($request->score_operator, ['=', '<', '>', '<=', '>=']) ? $request->score_operator : '=';
             $query->where('score', '!=', 'undefined')
-                ->whereRaw('CAST(score AS DECIMAL(5,2)) ' . $op . ' ?', [(float) $request->score]);
+                ->whereRaw('CAST(score AS DECIMAL(5,2)) '.$op.' ?', [(float) $request->score]);
         }
 
         if ($request->filled('feedback_percentage')) {
@@ -173,12 +173,12 @@ class AdminAnalyticsController extends Controller
 
         if ($request->filled('score')) {
             $op = in_array($request->score_operator, ['=', '<', '>', '<=', '>=']) ? $request->score_operator : '=';
-            $filters['Score'] = $op . ' ' . $request->score;
+            $filters['Score'] = $op.' '.$request->score;
         }
 
         if ($request->filled('feedback_percentage')) {
             $op = in_array($request->feedback_percentage_operator, ['=', '<', '>', '<=', '>=']) ? $request->feedback_percentage_operator : '=';
-            $filters['%Feedback'] = $op . ' ' . $request->feedback_percentage . '%';
+            $filters['%Feedback'] = $op.' '.$request->feedback_percentage.'%';
         }
 
         return $filters;

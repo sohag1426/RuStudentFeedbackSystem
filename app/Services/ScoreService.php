@@ -48,7 +48,7 @@ class ScoreService
                 $assessments_group_total_score = $assessments_group->sum('score');
                 $group_average = $assessments_group_total_score / $assessments_group_count;
 
-                $detailed_score = new DetailedScore();
+                $detailed_score = new DetailedScore;
                 $detailed_score->department_id = $assessment_event->department_id;
                 $detailed_score->event_id = $assessment_event->id;
                 $detailed_score->question_id = $question_id;
@@ -57,10 +57,18 @@ class ScoreService
                 $detailed_score->save();
             }
 
-            // Update group_average, min, max for ALL events in the same group that have been generated
-            $group_events = AssessmentEvent::where('group_id', $assessment_event->group_id)
-                ->where('score', '!=', 'undefined')
-                ->get();
+            // Update group_average, min, max for ALL events in the same group, year, and semester that have been generated
+            $group_events_query = AssessmentEvent::where('group_id', $assessment_event->group_id)
+                ->where('score', '!=', 'undefined');
+
+            if ($assessment_event->year) {
+                $group_events_query->where('year', $assessment_event->year);
+            }
+            if ($assessment_event->semester) {
+                $group_events_query->where('semester', $assessment_event->semester);
+            }
+
+            $group_events = $group_events_query->get();
 
             if ($group_events->count() > 0) {
                 $group_sum = $group_events->sum('score');

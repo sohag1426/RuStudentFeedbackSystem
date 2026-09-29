@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\Semester;
-use App\Enums\Year;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -46,16 +44,6 @@ class StudentGroup extends Model
     ];
 
     /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'year' => Year::class,
-        'semester' => Semester::class,
-    ];
-
-    /**
      * Get the department.
      */
     public function department(): BelongsTo
@@ -92,34 +80,26 @@ class StudentGroup extends Model
      */
     public function getDisplayNameAttribute(): string
     {
-        $yearVal = $this->year instanceof Year ? $this->year->value : $this->year;
-        $semesterVal = $this->semester instanceof Semester ? $this->semester->value : $this->semester;
-
-        $parts = array_filter([
+        $parts = array_unique(array_filter([
+            $this->name,
             $this->session,
-            $yearVal,
-            $semesterVal,
-        ]);
+        ]));
 
         if (! empty($parts)) {
-            return implode(', ', $parts);
+            return implode(' - ', $parts);
         }
 
-        return (string) $this->name;
+        return (string) ($this->name ?? $this->session ?? '');
     }
 
     /**
      * Scope a query to only include student groups eligible for assessment events:
-     * non-empty session, year, semester, and at least 1 student member.
+     * non-empty session and at least 1 student member.
      */
     public function scopeEligibleForAssessment($query)
     {
         return $query->whereNotNull('session')
             ->where('session', '!=', '')
-            ->whereNotNull('year')
-            ->where('year', '!=', '')
-            ->whereNotNull('semester')
-            ->where('semester', '!=', '')
             ->has('members');
     }
 
@@ -136,15 +116,10 @@ class StudentGroup extends Model
      */
     public function isEligibleForAssessment(): bool
     {
-        $yearVal = $this->year instanceof Year ? $this->year->value : $this->year;
-        $semesterVal = $this->semester instanceof Semester ? $this->semester->value : $this->semester;
-
         $hasSession = ! empty($this->session) && trim((string) $this->session) !== '';
-        $hasYear = ! empty($yearVal) && trim((string) $yearVal) !== '';
-        $hasSemester = ! empty($semesterVal) && trim((string) $semesterVal) !== '';
         $hasStudents = $this->relationLoaded('members') ? $this->members->isNotEmpty() : $this->members()->exists();
 
-        return $hasSession && $hasYear && $hasSemester && $hasStudents;
+        return $hasSession && $hasStudents;
     }
 
     /**

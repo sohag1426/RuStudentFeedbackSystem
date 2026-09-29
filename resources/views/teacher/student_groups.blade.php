@@ -64,8 +64,6 @@ $active_link = '1';
                     <th scope="col">#</th>
                     <th scope="col">Group Name</th>
                     <th scope="col">Session</th>
-                    <th scope="col">Year</th>
-                    <th scope="col">Semester</th>
                     <th scope="col">Total Student</th>
                     <th scope="col">Actions</th>
                 </tr>
@@ -76,8 +74,6 @@ $active_link = '1';
                     <td scope="row">{{ $student_group->id }}</td>
                     <td>{{ $student_group->name }}</td>
                     <td>{{ $student_group->session ?? '-' }}</td>
-                    <td>{{ $student_group->year?->value ?? $student_group->year ?? '-' }}</td>
-                    <td>{{ $student_group->semester?->value ?? $student_group->semester ?? '-' }}</td>
                     <td>{{ $student_group->members->count() }}</td>
                     <td>
                         {{-- Edit --}}

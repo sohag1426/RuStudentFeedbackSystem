@@ -57,20 +57,28 @@
                                     @change="onCourseChange()"
                                     required>
                                 <option value="">Please select Course...</option>
-                                @foreach ($courses as $course)
+                                @forelse ($courses as $course)
                                     <option value="{{ $course->id }}" {{ old('course_id') == $course->id ? 'selected' : '' }}>
                                         {{ $course->name }} : {{ $course->code }}
                                         @if ($course->year && $course->semester)
                                             ({{ $course->year->value ?? $course->year }}, {{ $course->semester->value ?? $course->semester }})
                                         @endif
                                     </option>
-                                @endforeach
+                                @empty
+                                    <option value="" disabled>No eligible courses found. Please update courses first.</option>
+                                @endforelse
                             </select>
                             @error('course_id')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
+                            <small class="form-text text-muted" x-show="selectedCourse && selectedCourse.year && selectedCourse.semester" x-cloak>
+                                Course Term: <strong x-text="selectedCourse.year + ', ' + selectedCourse.semester"></strong>
+                            </small>
+                            <small class="form-text text-muted">
+                                Note: Only courses with assigned Year &amp; Semester are listed. If a course is missing, please update it under <a href="{{ route('courses.index') }}">Courses</a> first.
+                            </small>
                         </div>
                         <!--/course_id-->
 
@@ -80,17 +88,10 @@
                             <select class="form-control @error('group_id') is-invalid @enderror"
                                     id="group_id"
                                     name="group_id"
-                                    x-model="groupId"
-                                    :disabled="!courseId"
                                     required>
-                                <option value="" x-show="!courseId">Please select a course first...</option>
-                                <option value="" x-show="courseId && filteredGroups.length === 0" x-cloak>No student group matches this course's Year & Semester</option>
-                                <option value="" x-show="courseId && filteredGroups.length > 0">Please select Student Group...</option>
+                                <option value="">Please select Student Group...</option>
                                 @foreach ($groups as $group)
-                                    <option value="{{ $group->id }}"
-                                            data-year="{{ $group->year instanceof \App\Enums\Year ? $group->year->value : $group->year }}"
-                                            data-semester="{{ $group->semester instanceof \App\Enums\Semester ? $group->semester->value : $group->semester }}"
-                                            {{ old('group_id') == $group->id ? 'selected' : '' }}>
+                                    <option value="{{ $group->id }}" {{ old('group_id') == $group->id ? 'selected' : '' }}>
                                         {{ $group->display_name }}
                                     </option>
                                 @endforeach
@@ -100,12 +101,6 @@
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
-                            <small class="form-text text-muted" x-show="selectedCourse && selectedCourse.year && selectedCourse.semester" x-cloak>
-                                Filtered for: <strong x-text="selectedCourse.year + ', ' + selectedCourse.semester"></strong>
-                            </small>
-                            <small class="form-text text-danger" x-show="courseId && selectedCourse && selectedCourse.year && selectedCourse.semester && filteredGroups.length === 0" x-cloak>
-                                No eligible student group found matching <span x-text="selectedCourse.year + ', ' + selectedCourse.semester"></span>.
-                            </small>
                         </div>
                         <!--/group_id-->
 
@@ -222,87 +217,13 @@
         function assessmentEventForm() {
             return {
                 courses: @json($coursesData),
-                groups: @json($groupsData),
                 courseId: '{{ old('course_id') }}',
-                groupId: '{{ old('group_id') }}',
 
                 get selectedCourse() {
                     return this.courses.find(c => String(c.id) === String(this.courseId)) || null;
                 },
 
-                get filteredGroups() {
-                    if (!this.selectedCourse) {
-                        return [];
-                    }
-                    if (!this.selectedCourse.year || !this.selectedCourse.semester) {
-                        return this.groups;
-                    }
-                    return this.groups.filter(g =>
-                        g.year === this.selectedCourse.year &&
-                        g.semester === this.selectedCourse.semester
-                    );
-                },
-
-                onCourseChange() {
-                    this.syncOptions();
-                },
-
-                syncOptions() {
-                    const groupSelect = document.getElementById('group_id');
-                    if (!groupSelect) return;
-
-                    const prevGroupId = this.groupId;
-                    groupSelect.innerHTML = '';
-
-                    if (!this.courseId) {
-                        groupSelect.disabled = true;
-                        const opt = document.createElement('option');
-                        opt.value = '';
-                        opt.textContent = 'Please select a course first...';
-                        groupSelect.appendChild(opt);
-                        this.groupId = '';
-                        return;
-                    }
-
-                    groupSelect.disabled = false;
-                    const matched = this.filteredGroups;
-
-                    if (matched.length === 0) {
-                        const opt = document.createElement('option');
-                        opt.value = '';
-                        opt.textContent = 'No student group matches this course\'s Year & Semester';
-                        groupSelect.appendChild(opt);
-                        this.groupId = '';
-                        return;
-                    }
-
-                    const defaultOpt = document.createElement('option');
-                    defaultOpt.value = '';
-                    defaultOpt.textContent = 'Please select Student Group...';
-                    groupSelect.appendChild(defaultOpt);
-
-                    let stillSelected = false;
-                    matched.forEach(g => {
-                        const opt = document.createElement('option');
-                        opt.value = g.id;
-                        opt.textContent = g.display_name;
-                        if (String(g.id) === String(prevGroupId)) {
-                            opt.selected = true;
-                            stillSelected = true;
-                        }
-                        groupSelect.appendChild(opt);
-                    });
-
-                    if (stillSelected) {
-                        this.groupId = prevGroupId;
-                    } else {
-                        this.groupId = '';
-                    }
-                },
-
-                init() {
-                    this.syncOptions();
-                }
+                init() {}
             };
         }
 
@@ -311,18 +232,6 @@
                 autoclose: true,
                 format: 'yyyy-mm-dd'
             });
-
-            // Fallback initialization if Alpine is not active
-            const groupSelect = document.getElementById('group_id');
-            const courseSelect = document.getElementById('course_id');
-            if (courseSelect && groupSelect && !window.Alpine) {
-                const form = assessmentEventForm();
-                courseSelect.addEventListener('change', function() {
-                    form.courseId = this.value;
-                    form.syncOptions();
-                });
-                form.syncOptions();
-            }
         });
     </script>
 @endsection

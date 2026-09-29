@@ -69,7 +69,7 @@ class StudentGroupMemberPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, student_group_member $studentGroupMember)
+    public function restore(User $user, StudentGroupMember $studentGroupMember)
     {
         //
     }
@@ -79,7 +79,7 @@ class StudentGroupMemberPolicy
      *
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, student_group_member $studentGroupMember)
+    public function forceDelete(User $user, StudentGroupMember $studentGroupMember)
     {
         //
     }

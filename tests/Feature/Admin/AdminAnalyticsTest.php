@@ -17,13 +17,21 @@ class AdminAnalyticsTest extends TestCase
     use RefreshDatabase;
 
     protected $admin;
+
     protected $department1;
+
     protected $department2;
+
     protected $teacher;
+
     protected $course;
+
     protected $group1;
+
     protected $group2;
+
     protected $event1;
+
     protected $event2;
 
     protected function setUp(): void
@@ -49,6 +57,8 @@ class AdminAnalyticsTest extends TestCase
             'department_id' => $this->department1->id,
             'code' => 'CSE101',
             'name' => 'Structured Programming',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
         ]);
 
         $this->group1 = StudentGroup::create([
@@ -56,8 +66,6 @@ class AdminAnalyticsTest extends TestCase
             'department_id' => $this->department1->id,
             'name' => 'CSE 2026',
             'session' => '2026-2027',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
         ]);
 
         $this->group2 = StudentGroup::create([
@@ -65,8 +73,6 @@ class AdminAnalyticsTest extends TestCase
             'department_id' => $this->department2->id,
             'name' => 'EEE 2025',
             'session' => '2025-2026',
-            'year' => '2nd Year',
-            'semester' => '2nd Semester',
         ]);
 
         $this->event1 = AssessmentEvent::create([
@@ -137,7 +143,7 @@ class AdminAnalyticsTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewHas('events', function ($events) {
-            return $events->contains($this->event1) && !$events->contains($this->event2);
+            return $events->contains($this->event1) && ! $events->contains($this->event2);
         });
     }
 
@@ -149,7 +155,7 @@ class AdminAnalyticsTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewHas('events', function ($events) {
-            return $events->contains($this->event1) && !$events->contains($this->event2);
+            return $events->contains($this->event1) && ! $events->contains($this->event2);
         });
     }
 
@@ -162,7 +168,7 @@ class AdminAnalyticsTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewHas('events', function ($events) {
-            return $events->contains($this->event2) && !$events->contains($this->event1);
+            return $events->contains($this->event2) && ! $events->contains($this->event1);
         });
     }
 
@@ -174,7 +180,7 @@ class AdminAnalyticsTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewHas('events', function ($events) {
-            return $events->contains($this->event2) && !$events->contains($this->event1);
+            return $events->contains($this->event2) && ! $events->contains($this->event1);
         });
     }
 
@@ -187,7 +193,7 @@ class AdminAnalyticsTest extends TestCase
         ]));
         $responseGt->assertStatus(200);
         $responseGt->assertViewHas('events', function ($events) {
-            return $events->contains($this->event1) && !$events->contains($this->event2);
+            return $events->contains($this->event1) && ! $events->contains($this->event2);
         });
 
         // Less than 4.0
@@ -197,7 +203,7 @@ class AdminAnalyticsTest extends TestCase
         ]));
         $responseLt->assertStatus(200);
         $responseLt->assertViewHas('events', function ($events) {
-            return $events->contains($this->event2) && !$events->contains($this->event1);
+            return $events->contains($this->event2) && ! $events->contains($this->event1);
         });
     }
 
@@ -210,7 +216,7 @@ class AdminAnalyticsTest extends TestCase
         ]));
         $responseGt->assertStatus(200);
         $responseGt->assertViewHas('events', function ($events) {
-            return $events->contains($this->event1) && !$events->contains($this->event2);
+            return $events->contains($this->event1) && ! $events->contains($this->event2);
         });
 
         // Equal to 40%
@@ -220,7 +226,7 @@ class AdminAnalyticsTest extends TestCase
         ]));
         $responseEq->assertStatus(200);
         $responseEq->assertViewHas('events', function ($events) {
-            return $events->contains($this->event2) && !$events->contains($this->event1);
+            return $events->contains($this->event2) && ! $events->contains($this->event1);
         });
     }
 

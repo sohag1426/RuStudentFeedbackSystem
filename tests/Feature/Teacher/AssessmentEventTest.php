@@ -42,6 +42,8 @@ class AssessmentEventTest extends TestCase
             'department_id' => $this->department->id,
             'code' => 'CSE101',
             'name' => 'Structured Programming',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
         ]);
 
         $this->group = StudentGroup::create([
@@ -49,8 +51,6 @@ class AssessmentEventTest extends TestCase
             'department_id' => $this->department->id,
             'name' => '2023-1',
             'session' => '2026-2027',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
         ]);
 
         StudentGroupMember::create([
@@ -101,8 +101,8 @@ class AssessmentEventTest extends TestCase
             'course_id' => $this->course->id,
             'group_id' => $this->group->id,
             'session' => $this->group->session,
-            'year' => $this->group->year->value,
-            'semester' => $this->group->semester->value,
+            'year' => $this->course->year->value,
+            'semester' => $this->course->semester->value,
             'feedback_percentage' => 0,
         ]);
 
@@ -122,8 +122,6 @@ class AssessmentEventTest extends TestCase
             'department_id' => $this->department->id,
             'name' => 'No Session Group',
             'session' => null,
-            'year' => '1st Year',
-            'semester' => '1st Semester',
         ]);
         StudentGroupMember::create([
             'department_id' => $this->department->id,
@@ -132,37 +130,18 @@ class AssessmentEventTest extends TestCase
             'name' => 'Student Two',
         ]);
 
-        // Invalid: missing year
-        $noYearGroup = StudentGroup::create([
-            'user_id' => $this->teacher->id,
-            'department_id' => $this->department->id,
-            'name' => 'No Year Group',
-            'session' => '2026-2027',
-            'year' => null,
-            'semester' => '1st Semester',
-        ]);
-        StudentGroupMember::create([
-            'department_id' => $this->department->id,
-            'group_id' => $noYearGroup->id,
-            'student_id' => '19100003',
-            'name' => 'Student Three',
-        ]);
-
         // Invalid: 0 students
         $zeroStudentGroup = StudentGroup::create([
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'name' => 'Zero Students Group',
             'session' => '2026-2027',
-            'year' => '2nd Year',
-            'semester' => '1st Semester',
         ]);
 
         $response = $this->actingAs($this->teacher)->get(route('assessment_events.create'));
         $response->assertStatus(200);
         $response->assertSee($this->group->display_name);
         $response->assertDontSee('No Session Group');
-        $response->assertDontSee('No Year Group');
         $response->assertDontSee('Zero Students Group');
     }
 
@@ -173,8 +152,6 @@ class AssessmentEventTest extends TestCase
             'department_id' => $this->department->id,
             'name' => 'Invalid Session Group',
             'session' => null,
-            'year' => '1st Year',
-            'semester' => '1st Semester',
         ]);
         StudentGroupMember::create([
             'department_id' => $this->department->id,
@@ -211,8 +188,6 @@ class AssessmentEventTest extends TestCase
             'department_id' => $this->department->id,
             'name' => 'Empty Group',
             'session' => '2026-2027',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
         ]);
 
         $today = Carbon::now('Asia/Dhaka')->format(config('datetimeformat.date_format'));
@@ -256,8 +231,6 @@ class AssessmentEventTest extends TestCase
             'department_id' => $this->department->id,
             'name' => 'Second Group',
             'session' => '2026-2027',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
         ]);
         StudentGroupMember::create([
             'department_id' => $this->department->id,
@@ -341,8 +314,6 @@ class AssessmentEventTest extends TestCase
             'department_id' => $this->department->id,
             'name' => 'Other Group',
             'session' => '2025-2026',
-            'year' => '2nd Year',
-            'semester' => '2nd Semester',
         ]);
 
         // Attempt direct model update on immutable fields
@@ -422,14 +393,12 @@ class AssessmentEventTest extends TestCase
         $this->assertEquals('1st Year', $event->year->value);
         $this->assertEquals('1st Semester', $event->semester->value);
 
-        // Attempt controller update with a new valid group having different session/year/semester
+        // Attempt controller update with a new valid group having different session
         $secondGroup = StudentGroup::create([
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'name' => 'Second Group',
             'session' => '2024-2025',
-            'year' => '2nd Year',
-            'semester' => '2nd Semester',
         ]);
         StudentGroupMember::create([
             'department_id' => $this->department->id,
@@ -468,9 +437,9 @@ class AssessmentEventTest extends TestCase
         $response->assertSee('assessmentEventForm()', false);
     }
 
-    public function test_cannot_create_event_if_course_and_group_year_or_semester_mismatch()
+    public function test_can_create_event_for_course_of_any_year_using_same_group()
     {
-        $mismatchedCourse = Course::create([
+        $secondYearCourse = Course::create([
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'code' => 'CSE201',
@@ -482,10 +451,9 @@ class AssessmentEventTest extends TestCase
         $today = Carbon::now('Asia/Dhaka')->format(config('datetimeformat.date_format'));
         $tomorrow = Carbon::now('Asia/Dhaka')->addDays(2)->format(config('datetimeformat.date_format'));
 
-        // $this->group is 1st Year, 1st Semester; $mismatchedCourse is 2nd Year, 1st Semester
         $response = $this->actingAs($this->teacher)->post(route('assessment_events.store'), [
             'teacher_id' => $this->teacher->id,
-            'course_id' => $mismatchedCourse->id,
+            'course_id' => $secondYearCourse->id,
             'group_id' => $this->group->id,
             'start_date' => $today,
             'start_hour' => 10,
@@ -495,15 +463,17 @@ class AssessmentEventTest extends TestCase
             'stop_minute' => 0,
         ]);
 
-        $response->assertRedirect(route('assessment_events.create'));
-        $response->assertSessionHasErrors('group_id');
-        $this->assertDatabaseMissing('assessment_events', [
-            'course_id' => $mismatchedCourse->id,
+        $response->assertRedirect(route('assessment_events.index'));
+        $this->assertDatabaseHas('assessment_events', [
+            'course_id' => $secondYearCourse->id,
             'group_id' => $this->group->id,
+            'year' => '2nd Year',
+            'semester' => '1st Semester',
+            'session' => $this->group->session,
         ]);
     }
 
-    public function test_can_create_event_when_course_and_group_year_and_semester_match()
+    public function test_can_create_event_when_course_and_group_are_valid()
     {
         $matchingCourse = Course::create([
             'user_id' => $this->teacher->id,
@@ -535,6 +505,132 @@ class AssessmentEventTest extends TestCase
             'group_id' => $this->group->id,
             'year' => '1st Year',
             'semester' => '1st Semester',
+            'session' => $this->group->session,
         ]);
+    }
+
+    public function test_create_view_filters_out_courses_without_year_or_semester()
+    {
+        $noYearCourse = Course::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'code' => 'CSE103',
+            'name' => 'No Year Course',
+            'year' => null,
+            'semester' => '1st Semester',
+        ]);
+
+        $noSemesterCourse = Course::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'code' => 'CSE104',
+            'name' => 'No Semester Course',
+            'year' => '1st Year',
+            'semester' => null,
+        ]);
+
+        $emptyCourseId = \Illuminate\Support\Facades\DB::table('courses')->insertGetId([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'code' => 'CSE105',
+            'name' => 'Empty Year Course',
+            'year' => '',
+            'semester' => '',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->teacher)->get(route('assessment_events.create'));
+        $response->assertStatus(200);
+
+        $coursesInView = $response->viewData('courses');
+        $this->assertTrue($coursesInView->contains('id', $this->course->id));
+        $this->assertFalse($coursesInView->contains('id', $noYearCourse->id));
+        $this->assertFalse($coursesInView->contains('id', $noSemesterCourse->id));
+        $this->assertFalse($coursesInView->contains('id', $emptyCourseId));
+
+        $coursesData = $response->viewData('coursesData');
+        $this->assertTrue($coursesData->contains('id', $this->course->id));
+        $this->assertFalse($coursesData->contains('id', $noYearCourse->id));
+        $this->assertFalse($coursesData->contains('id', $noSemesterCourse->id));
+        $this->assertFalse($coursesData->contains('id', $emptyCourseId));
+    }
+
+    public function test_cannot_create_assessment_event_with_course_missing_year_or_semester()
+    {
+        $invalidCourse = Course::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'code' => 'CSE106',
+            'name' => 'Incomplete Course',
+            'year' => null,
+            'semester' => null,
+        ]);
+
+        $today = Carbon::now('Asia/Dhaka')->format(config('datetimeformat.date_format'));
+        $tomorrow = Carbon::now('Asia/Dhaka')->addDays(2)->format(config('datetimeformat.date_format'));
+
+        $response = $this->actingAs($this->teacher)
+            ->from(route('assessment_events.create'))
+            ->post(route('assessment_events.store'), [
+                'teacher_id' => $this->teacher->id,
+                'course_id' => $invalidCourse->id,
+                'group_id' => $this->group->id,
+                'start_date' => $today,
+                'start_hour' => 10,
+                'start_minute' => 0,
+                'stop_date' => $tomorrow,
+                'stop_hour' => 17,
+                'stop_minute' => 0,
+            ]);
+
+        $response->assertRedirect(route('assessment_events.create'));
+        $response->assertSessionHasErrors('course_id');
+        $this->assertDatabaseMissing('assessment_events', [
+            'course_id' => $invalidCourse->id,
+        ]);
+    }
+
+    public function test_assessment_event_fills_year_and_semester_from_courses_and_session_from_student_groups()
+    {
+        $today = Carbon::now('Asia/Dhaka')->format(config('datetimeformat.date_format'));
+        $tomorrow = Carbon::now('Asia/Dhaka')->addDays(2)->format(config('datetimeformat.date_format'));
+
+        $response = $this->actingAs($this->teacher)
+            ->from(route('assessment_events.create'))
+            ->post(route('assessment_events.store'), [
+                'teacher_id' => $this->teacher->id,
+                'course_id' => $this->course->id,
+                'group_id' => $this->group->id,
+                'start_date' => $today,
+                'start_hour' => 10,
+                'start_minute' => 0,
+                'stop_date' => $tomorrow,
+                'stop_hour' => 17,
+                'stop_minute' => 0,
+            ]);
+
+        $response->assertRedirect(route('assessment_events.index'));
+
+        $event = AssessmentEvent::where('course_id', $this->course->id)->first();
+        $this->assertNotNull($event);
+        $this->assertEquals($this->course->year, $event->year);
+        $this->assertEquals($this->course->semester, $event->semester);
+        $this->assertEquals($this->group->session, $event->session);
+
+        // Also test model boot creating hook
+        $eventFromModel = AssessmentEvent::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'teacher_id' => $this->teacher->id,
+            'course_id' => $this->course->id,
+            'group_id' => $this->group->id,
+            'start_time' => Carbon::now(),
+            'stop_time' => Carbon::now()->addDays(2),
+        ]);
+
+        $this->assertEquals($this->course->year, $eventFromModel->year);
+        $this->assertEquals($this->course->semester, $eventFromModel->semester);
+        $this->assertEquals($this->group->session, $eventFromModel->session);
     }
 }

@@ -56,12 +56,18 @@ class AssessmentEvent extends Model
     protected static function booted(): void
     {
         static::creating(function (AssessmentEvent $event) {
-            if ($event->group_id && (! $event->session || ! $event->year || ! $event->semester)) {
+            if ($event->course_id && (! $event->year || ! $event->semester)) {
+                $course = $event->course ?? Course::find($event->course_id);
+                if ($course) {
+                    $event->year = $event->year ?: ($course->year instanceof Year ? $course->year->value : $course->year);
+                    $event->semester = $event->semester ?: ($course->semester instanceof Semester ? $course->semester->value : $course->semester);
+                }
+            }
+
+            if ($event->group_id && ! $event->session) {
                 $group = $event->group ?? StudentGroup::find($event->group_id);
                 if ($group) {
                     $event->session = $event->session ?: $group->session;
-                    $event->year = $event->year ?: ($group->year instanceof Year ? $group->year->value : $group->year);
-                    $event->semester = $event->semester ?: ($group->semester instanceof Semester ? $group->semester->value : $group->semester);
                 }
             }
         });

@@ -60,4 +60,42 @@ class Course extends Model
     {
         return $this->hasMany(AssessmentEvent::class, 'course_id', 'id');
     }
+
+    /**
+     * Scope a query to only include courses eligible for assessment events:
+     * non-empty year and semester.
+     */
+    public function scopeEligibleForAssessment($query)
+    {
+        return $query->whereNotNull('year')
+            ->where('year', '!=', '')
+            ->whereNotNull('semester')
+            ->where('semester', '!=', '');
+    }
+
+    /**
+     * Alias for scopeEligibleForAssessment.
+     */
+    public function scopeReadyForAssessment($query)
+    {
+        return $this->scopeEligibleForAssessment($query);
+    }
+
+    /**
+     * Determine whether the course is eligible for assessment events.
+     */
+    public function isEligibleForAssessment(): bool
+    {
+        try {
+            $year = $this->year;
+            $semester = $this->semester;
+        } catch (\ValueError) {
+            return false;
+        }
+
+        $yearVal = $year instanceof Year ? $year->value : $year;
+        $semesterVal = $semester instanceof Semester ? $semester->value : $semester;
+
+        return ! empty($yearVal) && ! empty($semesterVal) && trim((string) $yearVal) !== '' && trim((string) $semesterVal) !== '';
+    }
 }

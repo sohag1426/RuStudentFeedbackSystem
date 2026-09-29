@@ -17,10 +17,15 @@ class AdminReportTest extends TestCase
     use RefreshDatabase;
 
     protected $admin;
+
     protected $department;
+
     protected $teacher;
+
     protected $course;
+
     protected $group;
+
     protected $event;
 
     protected function setUp(): void
@@ -47,6 +52,8 @@ class AdminReportTest extends TestCase
             'department_id' => $this->department->id,
             'code' => 'CSE101',
             'name' => 'Structured Programming',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
         ]);
 
         $this->group = StudentGroup::create([
@@ -54,8 +61,6 @@ class AdminReportTest extends TestCase
             'department_id' => $this->department->id,
             'name' => '2023-1',
             'session' => '2026-2027',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
         ]);
 
         $this->event = AssessmentEvent::create([

@@ -30,13 +30,14 @@ class ScoreCalculationTest extends TestCase
             'department_id' => $department->id,
             'code' => 'CSE101',
             'name' => 'Structured Programming',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
         ]);
         $group = StudentGroup::create([
             'user_id' => $teacher->id,
             'department_id' => $department->id,
             'name' => 'CSE 2023',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
+            'session' => '2022-2023',
         ]);
         $event = AssessmentEvent::create([
             'user_id' => $teacher->id,
@@ -101,14 +102,14 @@ class ScoreCalculationTest extends TestCase
             'department_id' => $department->id,
             'code' => 'CSE102',
             'name' => 'Algorithms',
+            'year' => '2nd Year',
+            'semester' => '1st Semester',
         ]);
         $group = StudentGroup::create([
             'user_id' => $teacher->id,
             'department_id' => $department->id,
             'name' => 'CSE 2024',
             'session' => '2026-2027',
-            'year' => '2nd Year',
-            'semester' => '1st Semester',
         ]);
         $event = AssessmentEvent::create([
             'user_id' => $teacher->id,

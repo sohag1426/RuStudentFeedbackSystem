@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Student;
 
-use App\Models\Assessment;
 use App\Models\AssessmentEvent;
 use App\Models\AssessmentEventStudent;
 use App\Models\AssessmentStatus;
@@ -24,12 +23,19 @@ class StudentAssessmentTest extends TestCase
     use RefreshDatabase;
 
     protected $department;
+
     protected $teacher;
+
     protected $course;
+
     protected $group;
+
     protected $event;
+
     protected $student;
+
     protected $questionGroup;
+
     protected $question;
 
     protected function setUp(): void
@@ -50,14 +56,15 @@ class StudentAssessmentTest extends TestCase
             'department_id' => $this->department->id,
             'code' => 'CSE101',
             'name' => 'Structured Programming',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
         ]);
 
         $this->group = StudentGroup::create([
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'name' => '2023-1',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
+            'session' => '2022-2023',
         ]);
 
         $this->event = AssessmentEvent::create([
@@ -120,15 +127,15 @@ class StudentAssessmentTest extends TestCase
         ]);
 
         $response->assertRedirect(route('assessment_event_students.assessment_events.index', ['assessment_event_student' => $this->student]));
-        $this->assertTrue(session()->has('student_auth_token_' . $this->student->id));
+        $this->assertTrue(session()->has('student_auth_token_'.$this->student->id));
     }
 
     public function test_student_can_view_assessment_form()
     {
         $token = Str::random(40);
-        Cache::put('student_token_' . $this->student->id, $token, now()->addMinutes(60));
+        Cache::put('student_token_'.$this->student->id, $token, now()->addMinutes(60));
 
-        $response = $this->withSession(['student_auth_token_' . $this->student->id => $token])
+        $response = $this->withSession(['student_auth_token_'.$this->student->id => $token])
             ->get(route('assessment_event_students.assessment_events.edit', [
                 'assessment_event_student' => $this->student,
                 'assessment_event' => $this->event,
@@ -140,9 +147,9 @@ class StudentAssessmentTest extends TestCase
     public function test_student_can_submit_feedback_successfully()
     {
         $token = Str::random(40);
-        Cache::put('student_token_' . $this->student->id, $token, now()->addMinutes(60));
+        Cache::put('student_token_'.$this->student->id, $token, now()->addMinutes(60));
 
-        $response = $this->withSession(['student_auth_token_' . $this->student->id => $token])
+        $response = $this->withSession(['student_auth_token_'.$this->student->id => $token])
             ->put(route('assessment_event_students.assessment_events.update', [
                 'assessment_event_student' => $this->student,
                 'assessment_event' => $this->event,
@@ -182,9 +189,9 @@ class StudentAssessmentTest extends TestCase
         ]);
 
         $token = Str::random(40);
-        Cache::put('student_token_' . $this->student->id, $token, now()->addMinutes(60));
+        Cache::put('student_token_'.$this->student->id, $token, now()->addMinutes(60));
 
-        $response = $this->withSession(['student_auth_token_' . $this->student->id => $token])
+        $response = $this->withSession(['student_auth_token_'.$this->student->id => $token])
             ->get(route('assessment_event_students.assessment_events.edit', [
                 'assessment_event_student' => $this->student,
                 'assessment_event' => $this->event,
@@ -197,13 +204,13 @@ class StudentAssessmentTest extends TestCase
     public function test_student_can_logout()
     {
         $token = Str::random(40);
-        Cache::put('student_token_' . $this->student->id, $token, now()->addMinutes(60));
+        Cache::put('student_token_'.$this->student->id, $token, now()->addMinutes(60));
 
-        $response = $this->withSession(['student_auth_token_' . $this->student->id => $token])
+        $response = $this->withSession(['student_auth_token_'.$this->student->id => $token])
             ->post(route('assessment_event_students.logout.store', ['assessment_event_student' => $this->student]));
 
         $response->assertRedirect('/');
-        $this->assertFalse(session()->has('student_auth_token_' . $this->student->id));
-        $this->assertNull(Cache::get('student_token_' . $this->student->id));
+        $this->assertFalse(session()->has('student_auth_token_'.$this->student->id));
+        $this->assertNull(Cache::get('student_token_'.$this->student->id));
     }
 }

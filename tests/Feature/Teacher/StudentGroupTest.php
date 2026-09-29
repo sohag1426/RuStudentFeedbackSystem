@@ -14,6 +14,7 @@ class StudentGroupTest extends TestCase
     use RefreshDatabase;
 
     protected $department;
+
     protected $teacher;
 
     protected function setUp(): void
@@ -32,15 +33,13 @@ class StudentGroupTest extends TestCase
 
     public function test_student_group_session_defaults_to_null()
     {
-        $group = new StudentGroup();
+        $group = new StudentGroup;
         $this->assertNull($group->session);
 
         $savedGroup = StudentGroup::create([
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'name' => 'Batch 2023',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
         ]);
 
         $this->assertNull($savedGroup->session);
@@ -56,8 +55,6 @@ class StudentGroupTest extends TestCase
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'name' => 'Batch 2023',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
             'session' => '2025-2026',
         ]);
 
@@ -83,8 +80,6 @@ class StudentGroupTest extends TestCase
     {
         $response = $this->actingAs($this->teacher)->post(route('student_groups.store'), [
             'name' => 'Batch 2024',
-            'year' => '1st Year',
-            'semester' => '2nd Semester',
             'session' => '',
         ]);
 
@@ -98,16 +93,12 @@ class StudentGroupTest extends TestCase
     {
         $response = $this->actingAs($this->teacher)->post(route('student_groups.store'), [
             'name' => 'Batch 2024',
-            'year' => '1st Year',
-            'semester' => '2nd Semester',
             'session' => '2026-2027',
         ]);
 
         $response->assertRedirect(route('student_groups.index'));
         $this->assertDatabaseHas('student_groups', [
             'name' => 'Batch 2024',
-            'year' => '1st Year',
-            'semester' => '2nd Semester',
             'session' => '2026-2027',
             'department_id' => $this->department->id,
         ]);
@@ -119,15 +110,11 @@ class StudentGroupTest extends TestCase
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'name' => 'Batch 2023',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
             'session' => '2025-2026',
         ]);
 
         $response = $this->actingAs($this->teacher)->post(route('student_groups.store'), [
             'name' => 'Batch 2023',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
             'session' => '2025-2026',
         ]);
 
@@ -141,8 +128,6 @@ class StudentGroupTest extends TestCase
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'name' => 'Batch 2023',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
             'session' => '2024-2025',
         ]);
 
@@ -157,15 +142,11 @@ class StudentGroupTest extends TestCase
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'name' => 'Batch 2023',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
             'session' => '2024-2025',
         ]);
 
         $response = $this->actingAs($this->teacher)->put(route('student_groups.update', $group), [
             'name' => 'Batch 2023 Updated',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
             'session' => '',
         ]);
 
@@ -181,15 +162,11 @@ class StudentGroupTest extends TestCase
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'name' => 'Batch 2023',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
             'session' => '2024-2025',
         ]);
 
         $response = $this->actingAs($this->teacher)->put(route('student_groups.update', $group), [
             'name' => 'Batch 2023 Updated',
-            'year' => '2nd Year',
-            'semester' => '1st Semester',
             'session' => '2025-2026',
         ]);
 
@@ -199,26 +176,21 @@ class StudentGroupTest extends TestCase
         $this->assertEquals('2025-2026', $group->session);
     }
 
-    public function test_display_name_strictly_uses_session_year_and_semester()
+    public function test_display_name_uses_name_and_session()
     {
         $group = new StudentGroup([
-            'name' => 'Legacy Name Should Not Appear',
+            'name' => 'Batch A',
             'session' => '2026-2027',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
         ]);
 
-        $this->assertEquals('2026-2027, 1st Year, 1st Semester', $group->display_name);
-        $this->assertStringNotContainsString('Legacy Name', $group->display_name);
+        $this->assertEquals('Batch A - 2026-2027', $group->display_name);
     }
 
-    public function test_display_name_fallback_to_name_when_attributes_are_empty()
+    public function test_display_name_fallback_to_name_when_session_is_empty()
     {
         $group = new StudentGroup([
             'name' => 'Old Legacy Group',
             'session' => null,
-            'year' => null,
-            'semester' => null,
         ]);
 
         $this->assertEquals('Old Legacy Group', $group->display_name);

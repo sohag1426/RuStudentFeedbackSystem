@@ -42,14 +42,14 @@ class ReportScheduleTest extends TestCase
             'department_id' => $this->department->id,
             'code' => 'CSE101',
             'name' => 'Structured Programming',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
         ]);
         $this->group = StudentGroup::create([
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'name' => 'CSE 2026',
             'session' => '2026-2027',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
         ]);
 
         $qGroup = QuestionsGroup::create(['en_name' => 'General Quality', 'bn_name' => 'মান']);
