@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\Semester;
 use App\Enums\Year;
 use App\Models\Course;
+use App\Models\Log;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
 
@@ -118,5 +119,58 @@ class CourseController extends Controller
         $course->save();
 
         return redirect()->route('courses.index');
+    }
+
+    /**
+     * Display change logs for courses in the user's department.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function changeLogs(Request $request)
+    {
+        $query = Log::where('department_id', $request->user()->department_id)
+            ->where(function ($q) {
+                $q->where('model_type', Course::class)
+                    ->orWhere('model_type', 'App\Models\Course')
+                    ->orWhere('topic', 'like', 'course %');
+            });
+
+        if ($request->filled('course_id')) {
+            $query->where('model_id', $request->course_id);
+        }
+
+        $logs = $query->latest()->get();
+
+        return view('teacher.courses-logs', [
+            'logs' => $logs,
+        ]);
+    }
+
+    /**
+     * Display change logs for a specific course.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function courseChangeLogs(Request $request, Course $course)
+    {
+        $this->authorize('view', $course);
+
+        $logs = Log::where('department_id', $request->user()->department_id)
+            ->where(function ($query) use ($course) {
+                $query->where(function ($q) use ($course) {
+                    $q->where('model_type', Course::class)
+                        ->where('model_id', $course->id);
+                })->orWhere(function ($q) use ($course) {
+                    $q->where('model_id', $course->id)
+                        ->where('topic', 'like', 'course %');
+                });
+            })
+            ->latest()
+            ->get();
+
+        return view('teacher.course-logs', [
+            'course' => $course,
+            'logs' => $logs,
+        ]);
     }
 }

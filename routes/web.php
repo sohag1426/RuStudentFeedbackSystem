@@ -51,6 +51,8 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::resource('users', UserController::class)->only(['index', 'create', 'store']);
     Route::resource('department-manager', DepartmentManagerController::class)->only(['index', 'create', 'store']);
     Route::resource('users.profile', UsersProfileEditController::class)->only(['create', 'store']);
+    Route::get('courses/change-logs', [CourseController::class, 'changeLogs'])->name('courses.change-logs');
+    Route::get('courses/{course}/change-logs', [CourseController::class, 'courseChangeLogs'])->name('courses.course-change-logs');
     Route::resource('courses', CourseController::class)->except(['show', 'destroy']);
     Route::get('student_groups/{student_group}/export', [StudentGroupController::class, 'export'])->name('student_groups.export');
     Route::resource('student_groups', StudentGroupController::class)->except(['show']);

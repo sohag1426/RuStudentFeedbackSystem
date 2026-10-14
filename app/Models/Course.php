@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Course extends Model
 {
@@ -59,6 +60,14 @@ class Course extends Model
     public function assessmentEvents(): HasMany
     {
         return $this->hasMany(AssessmentEvent::class, 'course_id', 'id');
+    }
+
+    /**
+     * Get the change logs for this course.
+     */
+    public function logs(): MorphMany
+    {
+        return $this->morphMany(Log::class, 'model');
     }
 
     /**

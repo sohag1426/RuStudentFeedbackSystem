@@ -28,6 +28,14 @@
             </a>
         </li>
         <!--/New courses-->
+        <!--Change Logs-->
+        <li class="nav-item ml-sm-2">
+            <a class="btn btn-outline-primary my-2 my-sm-0" href="{{ route('courses.change-logs') }}">
+                <i class="fas fa-history"></i>
+                Change Logs
+            </a>
+        </li>
+        <!--/Change Logs-->
     </ul>
 @endsection
 
@@ -65,6 +73,14 @@
                                     </a>
                                 @endcan
                                 {{-- Edit --}}
+
+                                {{-- Change Logs --}}
+                                <a class="btn btn-outline-secondary btn-sm mb-2"
+                                    href="{{ route('courses.course-change-logs', ['course' => $course]) }}">
+                                    <i class="fas fa-history"></i>
+                                    Change Logs
+                                </a>
+                                {{-- Change Logs --}}
                             </td>
                         </tr>
                     @endforeach

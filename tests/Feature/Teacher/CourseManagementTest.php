@@ -6,6 +6,7 @@ use App\Enums\Semester;
 use App\Enums\Year;
 use App\Models\Course;
 use App\Models\Department;
+use App\Models\Log;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -163,5 +164,101 @@ class CourseManagementTest extends TestCase
             'year' => '2nd Year',
             'semester' => '1st Semester',
         ]);
+    }
+
+    public function test_courses_index_view_displays_change_logs_buttons()
+    {
+        $course = Course::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'code' => 'CSE101',
+            'name' => 'Intro to Programming',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
+        ]);
+
+        $response = $this->actingAs($this->teacher)->get(route('courses.index'));
+        $response->assertStatus(200);
+        $response->assertSee(route('courses.change-logs'));
+        $response->assertSee(route('courses.course-change-logs', $course));
+        $response->assertSee('Change Logs');
+    }
+
+    public function test_teacher_can_view_course_change_logs()
+    {
+        $course = Course::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'code' => 'CSE101',
+            'name' => 'Intro to Programming',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
+        ]);
+
+        Log::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'topic' => 'course created',
+            'log' => 'Code: CSE101 Name: Intro to Programming',
+            'model_type' => Course::class,
+            'model_id' => $course->id,
+        ]);
+
+        $response = $this->actingAs($this->teacher)->get(route('courses.change-logs'));
+        $response->assertStatus(200);
+        $response->assertSee('Course Change Logs');
+        $response->assertSee('course created');
+        $response->assertSee('Code: CSE101 Name: Intro to Programming');
+        $response->assertSee($this->teacher->name);
+        $response->assertSee(route('courses.index'));
+    }
+
+    public function test_teacher_can_view_single_course_change_logs()
+    {
+        $course = Course::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'code' => 'CSE101',
+            'name' => 'Intro to Programming',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
+        ]);
+
+        Log::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'topic' => 'course code updated',
+            'log' => 'Original: CSE100 New: CSE101',
+            'model_type' => Course::class,
+            'model_id' => $course->id,
+        ]);
+
+        $response = $this->actingAs($this->teacher)->get(route('courses.course-change-logs', $course));
+        $response->assertStatus(200);
+        $response->assertSee('Change Logs: CSE101');
+        $response->assertSee('course code updated');
+        $response->assertSee('Original: CSE100 New: CSE101');
+        $response->assertSee($this->teacher->name);
+        $response->assertSee(route('courses.index'));
+        $response->assertSee(route('courses.change-logs'));
+    }
+
+    public function test_teacher_cannot_view_change_logs_of_course_from_another_department()
+    {
+        $otherDepartment = Department::create([
+            'en_name' => 'Electrical & Electronic Engineering',
+        ]);
+
+        $otherCourse = Course::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $otherDepartment->id,
+            'code' => 'EEE101',
+            'name' => 'Circuit Analysis',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
+        ]);
+
+        $response = $this->actingAs($this->teacher)->get(route('courses.course-change-logs', $otherCourse));
+        $response->assertStatus(403);
     }
 }
