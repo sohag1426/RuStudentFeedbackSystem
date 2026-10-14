@@ -79,6 +79,8 @@ class CourseController extends Controller
      */
     public function edit(Course $course)
     {
+        $this->authorize('update', $course);
+
         return view('teacher.courses-edit', [
             'course' => $course,
             'years' => Year::cases(),
@@ -93,29 +95,71 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $course)
     {
-        $request->validate([
-            'code' => 'required|string',
-            'name' => 'required|string',
-            'year' => ['required', new Enum(Year::class)],
-            'semester' => ['required', new Enum(Semester::class)],
-        ]);
+        $this->authorize('update', $course);
 
-        if ($request->code != $course->code) {
-            if (Course::where('department_id', $request->user()->department_id)->where('code', $request->code)->count()) {
-                return redirect()->route('courses.index')->with('info', 'Duplicate Course Code');
-            }
+        // Disallow tampering with locked columns
+        if (! $request->user()->can('updateCode', $course) && $request->has('code') && $request->code !== $course->code) {
+            $this->authorize('updateCode', $course);
         }
 
-        if ($request->name != $course->name) {
-            if (Course::where('department_id', $request->user()->department_id)->where('name', $request->name)->count()) {
-                return redirect()->route('courses.index')->with('info', 'Duplicate Course Name');
-            }
+        if (! $request->user()->can('updateName', $course) && $request->has('name') && $request->name !== $course->name) {
+            $this->authorize('updateName', $course);
         }
 
-        $course->code = $request->code;
-        $course->name = $request->name;
-        $course->year = $request->year;
-        $course->semester = $request->semester;
+        $currentYearVal = $course->year instanceof Year ? $course->year->value : $course->year;
+        if (! $request->user()->can('updateYear', $course) && $request->has('year') && $request->year !== $currentYearVal) {
+            $this->authorize('updateYear', $course);
+        }
+
+        $currentSemVal = $course->semester instanceof Semester ? $course->semester->value : $course->semester;
+        if (! $request->user()->can('updateSemester', $course) && $request->has('semester') && $request->semester !== $currentSemVal) {
+            $this->authorize('updateSemester', $course);
+        }
+
+        $rules = [];
+        if ($request->user()->can('updateCode', $course)) {
+            $rules['code'] = 'required|string';
+        }
+        if ($request->user()->can('updateName', $course)) {
+            $rules['name'] = 'required|string';
+        }
+        if ($request->user()->can('updateYear', $course)) {
+            $rules['year'] = ['required', new Enum(Year::class)];
+        }
+        if ($request->user()->can('updateSemester', $course)) {
+            $rules['semester'] = ['required', new Enum(Semester::class)];
+        }
+
+        if (! empty($rules)) {
+            $request->validate($rules);
+        }
+
+        if ($request->user()->can('updateCode', $course) && $request->filled('code')) {
+            if ($request->code != $course->code) {
+                if (Course::where('department_id', $request->user()->department_id)->where('code', $request->code)->count()) {
+                    return redirect()->route('courses.index')->with('info', 'Duplicate Course Code');
+                }
+            }
+            $course->code = $request->code;
+        }
+
+        if ($request->user()->can('updateName', $course) && $request->filled('name')) {
+            if ($request->name != $course->name) {
+                if (Course::where('department_id', $request->user()->department_id)->where('name', $request->name)->count()) {
+                    return redirect()->route('courses.index')->with('info', 'Duplicate Course Name');
+                }
+            }
+            $course->name = $request->name;
+        }
+
+        if ($request->user()->can('updateYear', $course) && $request->filled('year')) {
+            $course->year = $request->year;
+        }
+
+        if ($request->user()->can('updateSemester', $course) && $request->filled('semester')) {
+            $course->semester = $request->semester;
+        }
+
         $course->save();
 
         return redirect()->route('courses.index');

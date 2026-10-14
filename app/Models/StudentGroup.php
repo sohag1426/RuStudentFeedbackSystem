@@ -129,4 +129,36 @@ class StudentGroup extends Model
     {
         return $this->isEligibleForAssessment();
     }
+
+    /**
+     * Determine whether a student group already exists for the given department and session.
+     */
+    public static function existsForSession(int $departmentId, string $session, ?int $excludeId = null): bool
+    {
+        $query = static::where('department_id', $departmentId)
+            ->where('session', $session);
+
+        if ($excludeId !== null) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        return $query->exists();
+    }
+
+    /**
+     * Determine whether any student group in the database (or department) has a null or empty session.
+     */
+    public static function hasNullSession(?int $departmentId = null): bool
+    {
+        $query = static::where(function ($q) {
+            $q->whereNull('session')
+                ->orWhere('session', '');
+        });
+
+        if ($departmentId !== null) {
+            $query->where('department_id', $departmentId);
+        }
+
+        return $query->exists();
+    }
 }

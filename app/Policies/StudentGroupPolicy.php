@@ -27,10 +27,28 @@ class StudentGroupPolicy
 
     /**
      * Determine whether the user can create models.
+     * Blocks creation if any student group in the department has a null or empty session.
+     * If a session is specified, returns false if a student group for that session already exists in the department.
      */
-    public function create(User $user): bool
+    public function create(User $user, ?string $session = null): bool
     {
+        if (StudentGroup::hasNullSession($user->department_id)) {
+            return false;
+        }
+
+        if ($session !== null && trim($session) !== '') {
+            return ! StudentGroup::existsForSession($user->department_id, $session);
+        }
+
         return true;
+    }
+
+    /**
+     * Determine whether the user can create a student group for a given session.
+     */
+    public function createForSession(User $user, string $session): bool
+    {
+        return $this->create($user, $session);
     }
 
     /**
@@ -39,6 +57,22 @@ class StudentGroupPolicy
     public function update(User $user, StudentGroup $studentGroup): bool
     {
         return $user->department_id == $studentGroup->department_id;
+    }
+
+    /**
+     * Determine whether the user can update the session of a student group.
+     */
+    public function updateSession(User $user, StudentGroup $studentGroup, ?string $newSession = null): bool
+    {
+        if ($user->department_id != $studentGroup->department_id) {
+            return false;
+        }
+
+        if ($newSession !== null && trim($newSession) !== '') {
+            return ! StudentGroup::existsForSession($user->department_id, $newSession, $studentGroup->id);
+        }
+
+        return true;
     }
 
     /**

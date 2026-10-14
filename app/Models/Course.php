@@ -107,4 +107,58 @@ class Course extends Model
 
         return ! empty($yearVal) && ! empty($semesterVal) && trim((string) $yearVal) !== '' && trim((string) $semesterVal) !== '';
     }
+
+    /**
+     * Determine whether a specific column is editable (is null or empty string).
+     */
+    public function isColumnEditable(string $column): bool
+    {
+        $value = match ($column) {
+            'year' => $this->year instanceof Year ? $this->year->value : $this->year,
+            'semester' => $this->semester instanceof Semester ? $this->semester->value : $this->semester,
+            default => $this->{$column} ?? null,
+        };
+
+        return is_null($value) || trim((string) $value) === '';
+    }
+
+    /**
+     * Determine whether the course code is editable.
+     */
+    public function canEditCode(): bool
+    {
+        return $this->isColumnEditable('code');
+    }
+
+    /**
+     * Determine whether the course name is editable.
+     */
+    public function canEditName(): bool
+    {
+        return $this->isColumnEditable('name');
+    }
+
+    /**
+     * Determine whether the course year is editable.
+     */
+    public function canEditYear(): bool
+    {
+        return $this->isColumnEditable('year');
+    }
+
+    /**
+     * Determine whether the course semester is editable.
+     */
+    public function canEditSemester(): bool
+    {
+        return $this->isColumnEditable('semester');
+    }
+
+    /**
+     * Determine whether the course has any editable columns left.
+     */
+    public function hasEditableColumns(): bool
+    {
+        return $this->canEditCode() || $this->canEditName() || $this->canEditYear() || $this->canEditSemester();
+    }
 }

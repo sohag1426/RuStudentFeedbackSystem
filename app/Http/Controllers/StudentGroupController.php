@@ -30,10 +30,21 @@ class StudentGroupController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
+        if (StudentGroup::hasNullSession($request->user()->department_id)) {
+            return redirect()->route('student_groups.index')
+                ->with('info', 'Please update existing student groups with missing session before creating a new student group.');
+        }
+
+        $existingSessions = StudentGroup::where('department_id', $request->user()->department_id)
+            ->whereNotNull('session')
+            ->pluck('session')
+            ->toArray();
+
         return view('teacher.student_group_create', [
             'sessions' => SessionService::getSessions(),
+            'existingSessions' => $existingSessions,
         ]);
     }
 
@@ -44,13 +55,17 @@ class StudentGroupController extends Controller
      */
     public function store(Request $request)
     {
+        if (StudentGroup::hasNullSession($request->user()->department_id)) {
+            return redirect()->route('student_groups.index')
+                ->with('info', 'Please update existing student groups with missing session before creating a new student group.');
+        }
+
         $request->validate([
             'name' => 'required|string',
             'session' => 'required|string',
         ]);
 
         if (StudentGroup::where('department_id', $request->user()->department_id)
-            ->where('name', $request->name)
             ->where('session', $request->session)
             ->exists()) {
             return redirect()->route('student_groups.index')->with('info', 'Duplicate Student Group');
@@ -92,7 +107,6 @@ class StudentGroupController extends Controller
         ]);
 
         if (StudentGroup::where('department_id', $request->user()->department_id)
-            ->where('name', $request->name)
             ->where('session', $request->session)
             ->where('id', '!=', $student_group->id)
             ->exists()) {

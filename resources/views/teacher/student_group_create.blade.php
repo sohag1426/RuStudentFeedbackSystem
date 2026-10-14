@@ -56,8 +56,11 @@
                             <select name="session" id="session" class="form-control @error('session') is-invalid @enderror" required>
                                 <option value="">Select Session</option>
                                 @foreach ($sessions ?? \App\Services\SessionService::getSessions() as $sessionOption)
-                                    <option value="{{ $sessionOption }}" {{ old('session') == $sessionOption ? 'selected' : '' }}>
-                                        {{ $sessionOption }}
+                                    @php
+                                        $isTaken = in_array($sessionOption, $existingSessions ?? []);
+                                    @endphp
+                                    <option value="{{ $sessionOption }}" {{ old('session') == $sessionOption ? 'selected' : '' }} {{ $isTaken ? 'disabled' : '' }}>
+                                        {{ $sessionOption }}{{ $isTaken ? ' (Already Exists)' : '' }}
                                     </option>
                                 @endforeach
                             </select>

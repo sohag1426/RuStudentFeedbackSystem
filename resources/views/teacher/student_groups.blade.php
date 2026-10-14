@@ -21,17 +21,28 @@ $active_link = '1';
 @section('contentTitle')
 <ul class="nav flex-column flex-sm-row ml-4">
     <!--New student_group-->
+    @can('create', App\Models\StudentGroup::class)
     <li class="nav-item">
         <a class="btn btn-outline-success my-2 my-sm-0" href="{{ route('student_groups.create') }}">
             <i class="fas fa-plus"></i>
             Create Student Group
         </a>
     </li>
+    @endcan
     <!--/New student_group-->
 </ul>
 @endsection
 
 @section('content')
+@if (\App\Models\StudentGroup::hasNullSession(auth()->user()->department_id))
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        <strong>Action required:</strong> You have student group(s) with missing session. Please edit and assign a session to existing groups before creating a new student group.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+@endif
 <div class="card">
 
     <!--modal -->

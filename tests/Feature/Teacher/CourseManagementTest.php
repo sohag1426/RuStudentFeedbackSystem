@@ -122,26 +122,90 @@ class CourseManagementTest extends TestCase
         $response->assertSessionHas('info', 'Duplicate Course Code');
     }
 
-    public function test_teacher_can_render_edit_page_with_years_and_semesters()
+    public function test_teacher_cannot_edit_fully_populated_course()
+    {
+        $course = Course::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'code' => 'CSE101',
+            'name' => 'Original Name',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
+        ]);
+
+        // Accessing edit page is blocked with 403
+        $response = $this->actingAs($this->teacher)->get(route('courses.edit', $course));
+        $response->assertStatus(403);
+
+        // Attempting to update is blocked with 403
+        $response = $this->actingAs($this->teacher)->put(route('courses.update', ['course' => $course]), [
+            'code' => 'CSE102',
+            'name' => 'Updated Name',
+            'year' => '2nd Year',
+            'semester' => '2nd Semester',
+        ]);
+        $response->assertStatus(403);
+
+        $course->refresh();
+        $this->assertEquals('CSE101', $course->code);
+        $this->assertEquals('Original Name', $course->name);
+    }
+
+    public function test_teacher_can_render_edit_page_when_course_has_null_columns()
     {
         $course = Course::create([
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'code' => 'CSE101',
             'name' => 'Old Name',
-            'year' => '1st Year',
-            'semester' => '1st Semester',
+            'year' => null,
+            'semester' => null,
         ]);
 
         $response = $this->actingAs($this->teacher)->get(route('courses.edit', $course));
         $response->assertStatus(200);
-        $response->assertSee('1st Year');
-        $response->assertSee('1st Semester');
+        $response->assertSee('Select Year');
+        $response->assertSee('Select Semester');
+        $response->assertSee('disabled', false); // disabled for locked code/name
     }
 
-    public function test_teacher_can_update_course()
+    public function test_teacher_can_update_only_null_columns_on_course()
     {
         $course = Course::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'code' => 'CSE101',
+            'name' => 'Old Name',
+            'year' => null,
+            'semester' => null,
+        ]);
+
+        // Trying to tamper with code or name is blocked with 403
+        $tamperResponse = $this->actingAs($this->teacher)->put(route('courses.update', ['course' => $course]), [
+            'code' => 'CSE999',
+            'name' => 'Old Name',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
+        ]);
+        $tamperResponse->assertStatus(403);
+
+        // Valid update of only the null columns
+        $response = $this->actingAs($this->teacher)->put(route('courses.update', ['course' => $course]), [
+            'year' => '1st Year',
+            'semester' => '1st Semester',
+        ]);
+
+        $response->assertRedirect(route('courses.index'));
+        $course->refresh();
+        $this->assertEquals('CSE101', $course->code);
+        $this->assertEquals('Old Name', $course->name);
+        $this->assertEquals('1st Year', $course->year->value);
+        $this->assertEquals('1st Semester', $course->semester->value);
+    }
+
+    public function test_course_column_policies_block_non_null_fields()
+    {
+        $fullyPopulated = Course::create([
             'user_id' => $this->teacher->id,
             'department_id' => $this->department->id,
             'code' => 'CSE101',
@@ -150,20 +214,26 @@ class CourseManagementTest extends TestCase
             'semester' => '1st Semester',
         ]);
 
-        $response = $this->actingAs($this->teacher)->put(route('courses.update', ['course' => $course]), [
-            'code' => 'CSE101',
-            'name' => 'Updated Name',
-            'year' => '2nd Year',
-            'semester' => '1st Semester',
+        $this->assertFalse($this->teacher->can('updateCode', $fullyPopulated));
+        $this->assertFalse($this->teacher->can('updateName', $fullyPopulated));
+        $this->assertFalse($this->teacher->can('updateYear', $fullyPopulated));
+        $this->assertFalse($this->teacher->can('updateSemester', $fullyPopulated));
+        $this->assertFalse($this->teacher->can('update', $fullyPopulated));
+
+        $partiallyPopulated = Course::create([
+            'user_id' => $this->teacher->id,
+            'department_id' => $this->department->id,
+            'code' => 'CSE102',
+            'name' => 'Partial Course',
+            'year' => null,
+            'semester' => null,
         ]);
 
-        $response->assertRedirect(route('courses.index'));
-        $this->assertDatabaseHas('courses', [
-            'id' => $course->id,
-            'name' => 'Updated Name',
-            'year' => '2nd Year',
-            'semester' => '1st Semester',
-        ]);
+        $this->assertFalse($this->teacher->can('updateCode', $partiallyPopulated));
+        $this->assertFalse($this->teacher->can('updateName', $partiallyPopulated));
+        $this->assertTrue($this->teacher->can('updateYear', $partiallyPopulated));
+        $this->assertTrue($this->teacher->can('updateSemester', $partiallyPopulated));
+        $this->assertTrue($this->teacher->can('update', $partiallyPopulated));
     }
 
     public function test_courses_index_view_displays_change_logs_buttons()

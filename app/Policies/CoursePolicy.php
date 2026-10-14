@@ -37,15 +37,89 @@ class CoursePolicy
     }
 
     /**
+     * Determine whether the user can update the course code.
+     * Code can only be edited if it is currently null or empty.
+     */
+    public function updateCode(User $user, Course $course): bool
+    {
+        if ($user->department_id != $course->department_id) {
+            return false;
+        }
+
+        return is_null($course->code) || trim((string) $course->code) === '';
+    }
+
+    /**
+     * Determine whether the user can update the course name.
+     * Name can only be edited if it is currently null or empty.
+     */
+    public function updateName(User $user, Course $course): bool
+    {
+        if ($user->department_id != $course->department_id) {
+            return false;
+        }
+
+        return is_null($course->name) || trim((string) $course->name) === '';
+    }
+
+    /**
+     * Determine whether the user can update the course year.
+     * Year can only be edited if it is currently null or empty.
+     */
+    public function updateYear(User $user, Course $course): bool
+    {
+        if ($user->department_id != $course->department_id) {
+            return false;
+        }
+
+        $year = $course->year instanceof \App\Enums\Year ? $course->year->value : $course->year;
+
+        return is_null($year) || trim((string) $year) === '';
+    }
+
+    /**
+     * Determine whether the user can update the course semester.
+     * Semester can only be edited if it is currently null or empty.
+     */
+    public function updateSemester(User $user, Course $course): bool
+    {
+        if ($user->department_id != $course->department_id) {
+            return false;
+        }
+
+        $semester = $course->semester instanceof \App\Enums\Semester ? $course->semester->value : $course->semester;
+
+        return is_null($semester) || trim((string) $semester) === '';
+    }
+
+    /**
+     * Determine whether a specific column can be updated.
+     */
+    public function updateColumn(User $user, Course $course, string $column): bool
+    {
+        return match ($column) {
+            'code' => $this->updateCode($user, $course),
+            'name' => $this->updateName($user, $course),
+            'year' => $this->updateYear($user, $course),
+            'semester' => $this->updateSemester($user, $course),
+            default => false,
+        };
+    }
+
+    /**
      * Determine whether the user can update the model.
+     * Allowed only if in the same department and at least one column is editable.
      */
     public function update(User $user, Course $course): bool
     {
-        if ($user->department_id == $course->department_id) {
-            return true;
+        if ($user->department_id != $course->department_id) {
+            return false;
         }
 
-        return false;
+        return $this->updateCode($user, $course)
+            || $this->updateName($user, $course)
+            || $this->updateYear($user, $course)
+            || $this->updateSemester($user, $course);
     }
 
     /**

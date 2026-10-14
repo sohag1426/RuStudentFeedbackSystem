@@ -72,4 +72,34 @@ class CourseTest extends TestCase
         ], true);
         $this->assertFalse($emptyCourse->isEligibleForAssessment());
     }
+
+    public function test_column_editability_methods()
+    {
+        $course = new Course;
+        $course->setRawAttributes([
+            'code' => 'CSE101',
+            'name' => 'Structured Programming',
+            'year' => null,
+            'semester' => null,
+        ], true);
+
+        $this->assertFalse($course->canEditCode());
+        $this->assertFalse($course->canEditName());
+        $this->assertTrue($course->canEditYear());
+        $this->assertTrue($course->canEditSemester());
+        $this->assertTrue($course->hasEditableColumns());
+
+        $course->setRawAttributes([
+            'code' => 'CSE101',
+            'name' => 'Structured Programming',
+            'year' => '1st Year',
+            'semester' => '1st Semester',
+        ], true);
+
+        $this->assertFalse($course->canEditCode());
+        $this->assertFalse($course->canEditName());
+        $this->assertFalse($course->canEditYear());
+        $this->assertFalse($course->canEditSemester());
+        $this->assertFalse($course->hasEditableColumns());
+    }
 }

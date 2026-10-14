@@ -42,9 +42,19 @@
 
                         <!--code-->
                         <div class="form-group">
-                            <label for="code"><span class="text-danger">*</span>Course Code</label>
+                            <label for="code">
+                                @can('updateCode', $course)
+                                    <span class="text-danger">*</span>
+                                @endcan
+                                Course Code
+                                @cannot('updateCode', $course)
+                                    <small class="text-muted">(Locked)</small>
+                                @endcannot
+                            </label>
                             <input name="code" type="text" class="form-control @error('code') is-invalid @enderror"
-                                id="code" value="{{ $course->code }}" required>
+                                id="code" value="{{ old('code', $course->code) }}"
+                                @cannot('updateCode', $course) disabled @endcannot
+                                @can('updateCode', $course) required @endcan>
                             @error('code')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -55,9 +65,19 @@
 
                         <!--name-->
                         <div class="form-group">
-                            <label for="name"><span class="text-danger">*</span>Course Name</label>
+                            <label for="name">
+                                @can('updateName', $course)
+                                    <span class="text-danger">*</span>
+                                @endcan
+                                Course Name
+                                @cannot('updateName', $course)
+                                    <small class="text-muted">(Locked)</small>
+                                @endcannot
+                            </label>
                             <input name="name" type="text" class="form-control @error('name') is-invalid @enderror"
-                                id="name" value="{{ $course->name }}" required>
+                                id="name" value="{{ old('name', $course->name) }}"
+                                @cannot('updateName', $course) disabled @endcannot
+                                @can('updateName', $course) required @endcan>
                             @error('name')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -68,8 +88,18 @@
 
                         <!--year-->
                         <div class="form-group">
-                            <label for="year"><span class="text-danger">*</span>Year</label>
-                            <select name="year" id="year" class="form-control @error('year') is-invalid @enderror" required>
+                            <label for="year">
+                                @can('updateYear', $course)
+                                    <span class="text-danger">*</span>
+                                @endcan
+                                Year
+                                @cannot('updateYear', $course)
+                                    <small class="text-muted">(Locked)</small>
+                                @endcannot
+                            </label>
+                            <select name="year" id="year" class="form-control @error('year') is-invalid @enderror"
+                                @cannot('updateYear', $course) disabled @endcannot
+                                @can('updateYear', $course) required @endcan>
                                 <option value="">Select Year</option>
                                 @foreach ($years ?? \App\Enums\Year::cases() as $yearOption)
                                     <option value="{{ $yearOption->value }}" {{ old('year', $course->year?->value ?? $course->year) == $yearOption->value ? 'selected' : '' }}>
@@ -87,8 +117,18 @@
 
                         <!--semester-->
                         <div class="form-group">
-                            <label for="semester"><span class="text-danger">*</span>Semester</label>
-                            <select name="semester" id="semester" class="form-control @error('semester') is-invalid @enderror" required>
+                            <label for="semester">
+                                @can('updateSemester', $course)
+                                    <span class="text-danger">*</span>
+                                @endcan
+                                Semester
+                                @cannot('updateSemester', $course)
+                                    <small class="text-muted">(Locked)</small>
+                                @endcannot
+                            </label>
+                            <select name="semester" id="semester" class="form-control @error('semester') is-invalid @enderror"
+                                @cannot('updateSemester', $course) disabled @endcannot
+                                @can('updateSemester', $course) required @endcan>
                                 <option value="">Select Semester</option>
                                 @foreach ($semesters ?? \App\Enums\Semester::cases() as $semesterOption)
                                     <option value="{{ $semesterOption->value }}" {{ old('semester', $course->semester?->value ?? $course->semester) == $semesterOption->value ? 'selected' : '' }}>
